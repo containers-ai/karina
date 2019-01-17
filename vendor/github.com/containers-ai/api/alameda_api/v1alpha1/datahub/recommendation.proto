@@ -1,0 +1,47 @@
+/// This file has messages related to recommendations of containers, pods, and nodes
+syntax = "proto3";
+
+package containers_ai.alameda.v1alpha1.datahub;
+
+import "google/protobuf/timestamp.proto";
+import "alameda_api/v1alpha1/datahub/metadata.proto";
+import "alameda_api/v1alpha1/datahub/pod_assignment.proto";
+import "alameda_api/v1alpha1/datahub/metric.proto";
+
+/**
+ * Represents a resource configuration recommendation
+ * 
+ * It includes recommended limits and requests for the initial stage (a container which is just started) and after the initial stage
+ *
+ */
+message ContainerRecommendation {
+    string name = 1;    
+    repeated MetricData limit_recommendations = 2;
+    repeated MetricData request_recommendations = 3;
+    repeated MetricData initial_limit_recommendations = 4;
+    repeated MetricData initial_request_recommendations = 5;
+}
+
+/**
+ * Represents a recommended pod-to-node assignment (i.e. pod placement)
+ * 
+ */
+message AssignPodPolicy {
+    google.protobuf.Timestamp time = 1;
+    oneof policy {
+        NodePriority node_priority = 2;
+        Selector node_selector = 3;
+        string node_name = 4;
+    };
+}
+
+/**
+ * Represents a set of container resource configuration recommenations of a pod
+ * 
+ */
+message PodRecommendation {
+    NamespacedName namespaced_name = 1;
+    bool apply_recommendation_now = 2;
+    AssignPodPolicy assign_pod_policy = 3;
+    repeated ContainerRecommendation container_recommendations = 4;
+}

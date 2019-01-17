@@ -1,0 +1,8 @@
+metrics-addr: :8080
+
+log:
+  set-logcallers: true
+  output-level: "info" # debug, info, warn, error, fatal, none
+  
+datahub:
+  address: "datahub.federatorai.svc.cluster.local:50050"

@@ -1,0 +1,18 @@
+/// This file has messages and services related to Containers.ai
+syntax = "proto3";
+
+package containersai.datahub.score.v1alpha2;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/containers-ai/api/datahub/score/v1alpha2";
+
+/**
+ * Represents a system score before and after pod scheduled on node
+ * 
+ */
+message SimulatedSchedulingScore {
+    google.protobuf.Timestamp time = 1;
+    double score_before = 2;
+    double score_after = 3;
+}

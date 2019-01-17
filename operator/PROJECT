@@ -1,0 +1,3 @@
+version: "1"
+domain: federator.ai
+repo: github.com/containers-ai/karina/operator

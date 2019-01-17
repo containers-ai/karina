@@ -1,0 +1,15 @@
+/// This file has messages related to nodes
+syntax = "proto3";
+
+package containers_ai.alameda.v1alpha1.datahub;
+
+/**
+ * Represents the priority of a node
+ */
+message NodePriority {
+    repeated string nodes = 1;
+}
+
+message Selector {
+    map<string, string> selector = 1;
+}

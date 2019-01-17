@@ -1,0 +1,14 @@
+/// This file has messages related to predictions of containers, pods, and nodes
+syntax = "proto3";
+
+package containersai.datahub.resource.metadata.v1alpha2;
+
+option go_package = "github.com/containers-ai/api/datahub/resource/metadata/v1alpha2";
+
+/**
+ * Represents kubernetes resource with namespace and name
+ */
+message NamespacedName {
+    string namespace = 1;
+    string name = 2;
+}
