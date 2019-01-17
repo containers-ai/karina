@@ -1,0 +1,71 @@
+/// This file has messages related to metric data of containers, pods, and nodes
+syntax = "proto3";
+
+package containersai.datahub.metric.v1alpha2;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "datahub/resource/metadata/v1alpha2/metadata.proto";
+
+option go_package = "github.com/containers-ai/api/datahub/metric/v1alpha2";
+
+/**
+ * Metric type. A metric may be either CPU or memory.
+ */
+enum MetricType {
+    UNDEFINED = 0;
+    CPU_USAGE_SECONDS_PERCENTAGE = 1;
+    MEMORY_USAGE_BYTES = 2;
+} 
+
+/**
+ * Represents metric data of a container
+ */
+message ContainerMetric {
+    string name = 1;
+    // use MetricType as key
+    map<int32, MetricData> metric_data = 2;
+}
+
+/**
+ * Represents metric data of a pod
+ */
+message PodMetric  {
+    containersai.datahub.resource.metadata.v1alpha2.NamespacedName namespaced_name = 1;
+    repeated ContainerMetric container_metrics = 2;
+}
+
+/**
+ * Represents metric data of a node
+ */
+message NodeMetric {
+    string name = 1;
+    // use MetricType as key
+    map<int32, MetricData> metric_data = 2;
+}
+
+/**
+ * Represents a data point of time-series metric data
+ */
+message Sample {
+    google.protobuf.Timestamp time = 1;
+    string num_value = 2;
+}
+
+/**
+ * Represents a time range definition
+ *
+ */
+message TimeRange {
+    google.protobuf.Timestamp start_time = 1;
+    google.protobuf.Timestamp end_time = 2;
+    google.protobuf.Duration step = 3;
+}
+
+/**
+ * Represents a piece of metreic data
+ */
+message MetricData {
+    // data can be time series or non-time series
+    repeated Sample data = 1;
+}

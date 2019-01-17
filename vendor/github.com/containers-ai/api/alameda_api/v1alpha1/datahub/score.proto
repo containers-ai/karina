@@ -1,0 +1,16 @@
+/// This file has messages and services related to Containers.ai
+syntax = "proto3";
+
+package containers_ai.alameda.v1alpha1.datahub;
+
+import "google/protobuf/timestamp.proto";
+
+/**
+ * Represents a system score before and after pod scheduled on node
+ * 
+ */
+message SimulatedSchedulingScore {
+    google.protobuf.Timestamp time = 1;
+    float score_before = 2;
+    float score_after = 3;
+}

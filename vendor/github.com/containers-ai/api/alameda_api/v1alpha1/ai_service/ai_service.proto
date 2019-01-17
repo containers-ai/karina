@@ -1,0 +1,74 @@
+/// This file has messages and services (methods) related to the AI engine. This file will be deprated in v0.2.
+syntax = "proto3";
+
+package containers_ai.alameda.v1alpha1.ai_service;
+
+import "google/protobuf/empty.proto";
+// import "google/rpc/status.proto";
+
+/**
+ *  Recommendation policy. A policy may be either stable or compact.
+ */
+enum RecommendationPolicy {
+    STABLE = 0;
+    COMPACT = 1;
+}
+
+/**
+ * Represents a Kubernetes pod.
+ *
+ */
+message Pod {
+    string node_name = 1;
+    string resourceLink = 2;
+}
+
+/**
+ * Represents a Kubernetes object.
+ */
+message Object {
+    /// Types of an object
+    enum Type {
+        POD = 0;
+        NODE = 1;
+    }
+    Type type = 1;
+    RecommendationPolicy policy = 2;
+    string uid = 3;
+    string namespace = 4;
+    string name = 5;
+    Pod pod = 6;
+}
+
+/**
+ * Represents a request for creating a list of prediction objects
+ */
+message PredictionObjectListCreationRequest {
+    repeated Object objects = 1;
+}
+
+/**
+ * Represents a request for removing a list of prediction objects
+ */
+message PredictionObjectListDeletionRequest {
+    repeated Object objects = 1;
+}
+
+/**
+ * Represents a reponse of a request
+ */
+message RequestResponse {
+    string message = 1;
+}
+
+/**
+ * Service for creating prediction objects.
+ */
+service AlamendaAIService {
+    /// Used to create prediction objects
+    rpc CreatePredictionObjects(PredictionObjectListCreationRequest)
+            returns (RequestResponse) {}
+    /// Used to remove prediction objects
+    rpc DeletePredictionObjects(PredictionObjectListDeletionRequest)
+            returns (google.protobuf.Empty) {}
+}

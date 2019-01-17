@@ -1,0 +1,2062 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>Protocol Documentation</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Ubuntu:400,700,400italic"/>
+    <style>
+      body {
+        width: 60em;
+        margin: 1em auto;
+        color: #222;
+        font-family: "Ubuntu", sans-serif;
+        padding-bottom: 4em;
+      }
+
+      h1 {
+        font-weight: normal;
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 0.5ex;
+      }
+
+      h2 {
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 0.5ex;
+        margin: 1.5em 0;
+      }
+
+      h3 {
+        font-weight: normal;
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 0.5ex;
+      }
+
+      a {
+        text-decoration: none;
+        color: #567e25;
+      }
+
+      table {
+        width: 100%;
+        font-size: 80%;
+        border-collapse: collapse;
+      }
+
+      thead {
+        font-weight: 700;
+        background-color: #dcdcdc;
+      }
+
+      tbody tr:nth-child(even) {
+        background-color: #fbfbfb;
+      }
+
+      td {
+        border: 1px solid #ccc;
+        padding: 0.5ex 2ex;
+      }
+
+      td p {
+        text-indent: 1em;
+        margin: 0;
+      }
+
+      td p:nth-child(1) {
+        text-indent: 0;  
+      }
+
+       
+      .field-table td:nth-child(1) {  
+        width: 10em;
+      }
+      .field-table td:nth-child(2) {  
+        width: 10em;
+      }
+      .field-table td:nth-child(3) {  
+        width: 6em;
+      }
+      .field-table td:nth-child(4) {  
+        width: auto;
+      }
+
+       
+      .extension-table td:nth-child(1) {  
+        width: 10em;
+      }
+      .extension-table td:nth-child(2) {  
+        width: 10em;
+      }
+      .extension-table td:nth-child(3) {  
+        width: 10em;
+      }
+      .extension-table td:nth-child(4) {  
+        width: 5em;
+      }
+      .extension-table td:nth-child(5) {  
+        width: auto;
+      }
+
+       
+      .enum-table td:nth-child(1) {  
+        width: 10em;
+      }
+      .enum-table td:nth-child(2) {  
+        width: 10em;
+      }
+      .enum-table td:nth-child(3) {  
+        width: auto;
+      }
+
+       
+      .scalar-value-types-table tr {
+        height: 3em;
+      }
+
+       
+      #toc-container ul {
+        list-style-type: none;
+        padding-left: 1em;
+        line-height: 180%;
+        margin: 0;
+      }
+      #toc > li > a {
+        font-weight: bold;
+      }
+
+       
+      .file-heading {
+        width: 100%;
+        display: table;
+        border-bottom: 1px solid #aaa;
+        margin: 4em 0 1.5em 0;
+      }
+      .file-heading h2 {
+        border: none;
+        display: table-cell;
+      }
+      .file-heading a {
+        text-align: right;
+        display: table-cell;
+      }
+
+       
+      .badge {
+        width: 1.6em;
+        height: 1.6em;
+        display: inline-block;
+
+        line-height: 1.6em;
+        text-align: center;
+        font-weight: bold;
+        font-size: 60%;
+
+        color: #89ba48;
+        background-color: #dff0c8;
+
+        margin: 0.5ex 1em 0.5ex -1em;
+        border: 1px solid #fbfbfb;
+        border-radius: 1ex;
+      }
+    </style>
+
+    
+    <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+  </head>
+
+  <body>
+
+    <h1 id="title">Protocol Documentation</h1>
+
+    <h2>Table of Contents</h2>
+
+    <div id="toc-container">
+      <ul id="toc">
+        
+          
+          <li>
+            <a href="#alameda_api%2fv1alpha1%2fdatahub%2fmetadata.proto">alameda_api/v1alpha1/datahub/metadata.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.NamespacedName"><span class="badge">M</span>NamespacedName</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#alameda_api%2fv1alpha1%2fdatahub%2fmetric.proto">alameda_api/v1alpha1/datahub/metric.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.ContainerMetric"><span class="badge">M</span>ContainerMetric</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.MetricData"><span class="badge">M</span>MetricData</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.NodeMetric"><span class="badge">M</span>NodeMetric</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.PodMetric"><span class="badge">M</span>PodMetric</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.Sample"><span class="badge">M</span>Sample</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.TimeRange"><span class="badge">M</span>TimeRange</a>
+                </li>
+              
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.MetricType"><span class="badge">E</span>MetricType</a>
+                </li>
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#alameda_api%2fv1alpha1%2fdatahub%2fpod_assignment.proto">alameda_api/v1alpha1/datahub/pod_assignment.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.NodePriority"><span class="badge">M</span>NodePriority</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.Selector"><span class="badge">M</span>Selector</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.Selector.SelectorEntry"><span class="badge">M</span>Selector.SelectorEntry</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#alameda_api%2fv1alpha1%2fdatahub%2fpredict.proto">alameda_api/v1alpha1/datahub/predict.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.ContainerPrediction"><span class="badge">M</span>ContainerPrediction</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.NodePrediction"><span class="badge">M</span>NodePrediction</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.PodPrediction"><span class="badge">M</span>PodPrediction</a>
+                </li>
+              
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.RecommendationPolicy"><span class="badge">E</span>RecommendationPolicy</a>
+                </li>
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#alameda_api%2fv1alpha1%2fdatahub%2frecommendation.proto">alameda_api/v1alpha1/datahub/recommendation.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.AssignPodPolicy"><span class="badge">M</span>AssignPodPolicy</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.ContainerRecommendation"><span class="badge">M</span>ContainerRecommendation</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.PodRecommendation"><span class="badge">M</span>PodRecommendation</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#alameda_api%2fv1alpha1%2fdatahub%2fresource.proto">alameda_api/v1alpha1/datahub/resource.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.Container"><span class="badge">M</span>Container</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.Node"><span class="badge">M</span>Node</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.Pod"><span class="badge">M</span>Pod</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#alameda_api%2fv1alpha1%2fdatahub%2fserver.proto">alameda_api/v1alpha1/datahub/server.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.CreateAlamedaNodesRequest"><span class="badge">M</span>CreateAlamedaNodesRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.CreateNodePredictionsRequest"><span class="badge">M</span>CreateNodePredictionsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.CreatePodPredictionsRequest"><span class="badge">M</span>CreatePodPredictionsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.CreatePodRecommendationsRequest"><span class="badge">M</span>CreatePodRecommendationsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.CreatePodsRequest"><span class="badge">M</span>CreatePodsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.DeleteAlamedaNodesRequest"><span class="badge">M</span>DeleteAlamedaNodesRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.DeletePodsRequest"><span class="badge">M</span>DeletePodsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.ListAlamedaPodsRequest"><span class="badge">M</span>ListAlamedaPodsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.ListNodeMetricsRequest"><span class="badge">M</span>ListNodeMetricsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.ListNodeMetricsResponse"><span class="badge">M</span>ListNodeMetricsResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.ListNodePredictionsRequest"><span class="badge">M</span>ListNodePredictionsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.ListNodePredictionsResponse"><span class="badge">M</span>ListNodePredictionsResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.ListNodesResponse"><span class="badge">M</span>ListNodesResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.ListPodMetricsRequest"><span class="badge">M</span>ListPodMetricsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.ListPodMetricsResponse"><span class="badge">M</span>ListPodMetricsResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.ListPodPredictionsRequest"><span class="badge">M</span>ListPodPredictionsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.ListPodPredictionsResponse"><span class="badge">M</span>ListPodPredictionsResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.ListPodRecommendationsRequest"><span class="badge">M</span>ListPodRecommendationsRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.ListPodRecommendationsResponse"><span class="badge">M</span>ListPodRecommendationsResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.ListPodsByNodeNameRequest"><span class="badge">M</span>ListPodsByNodeNameRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.ListPodsResponse"><span class="badge">M</span>ListPodsResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#containers_ai.alameda.v1alpha1.datahub.DatahubService"><span class="badge">S</span>DatahubService</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+        <li><a href="#scalar-value-types">Scalar Value Types</a></li>
+      </ul>
+    </div>
+
+    
+      
+      <div class="file-heading">
+        <h2 id="alameda_api/v1alpha1/datahub/metadata.proto">alameda_api/v1alpha1/datahub/metadata.proto</h2><a href="#title">Top</a>
+      </div>
+      <p>This file has messages related to Kubernetes metadata</p>
+
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.NamespacedName">NamespacedName</h3>
+        <p>Represents kubernetes resource with namespace and name</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>namespace</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="alameda_api/v1alpha1/datahub/metric.proto">alameda_api/v1alpha1/datahub/metric.proto</h2><a href="#title">Top</a>
+      </div>
+      <p>This file has messages related to metric data of containers, pods, and nodes</p>
+
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.ContainerMetric">ContainerMetric</h3>
+        <p>Represents metric data of a container</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>metric_data</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.MetricData">MetricData</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.MetricData">MetricData</h3>
+        <p>Represents a piece of metreic data</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>metric_type</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.MetricType">MetricType</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>data</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.Sample">Sample</a></td>
+                  <td>repeated</td>
+                  <td><p>data can be time series or non-time series </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.NodeMetric">NodeMetric</h3>
+        <p>Represents metric data of a node</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>metric_data</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.MetricData">MetricData</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.PodMetric">PodMetric</h3>
+        <p>Represents metric data of a pod</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>namespaced_name</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.NamespacedName">NamespacedName</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>container_metrics</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.ContainerMetric">ContainerMetric</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.Sample">Sample</h3>
+        <p>Represents a data point of time-series metric data</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>time</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>num_value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.TimeRange">TimeRange</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>start_time</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>end_time</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>step</td>
+                  <td><a href="#google.protobuf.Duration">google.protobuf.Duration</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.MetricType">MetricType</h3>
+        <p>Metric type. A metric may be either CPU or memory.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>UNDEFINED</td>
+                <td>0</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>CPU_USAGE_SECONDS_PERCENTAGE</td>
+                <td>1</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>MEMORY_USAGE_BYTES</td>
+                <td>2</td>
+                <td><p></p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="alameda_api/v1alpha1/datahub/pod_assignment.proto">alameda_api/v1alpha1/datahub/pod_assignment.proto</h2><a href="#title">Top</a>
+      </div>
+      <p>This file has messages related to nodes</p>
+
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.NodePriority">NodePriority</h3>
+        <p>Represents the priority of a node</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>nodes</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.Selector">Selector</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>selector</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.Selector.SelectorEntry">Selector.SelectorEntry</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.Selector.SelectorEntry">Selector.SelectorEntry</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>key</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>value</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="alameda_api/v1alpha1/datahub/predict.proto">alameda_api/v1alpha1/datahub/predict.proto</h2><a href="#title">Top</a>
+      </div>
+      <p>This file has messages related to predictions of containers, pods, and nodes</p>
+
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.ContainerPrediction">ContainerPrediction</h3>
+        <p>Represents a list of predicted metric data of a container</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>predicted_raw_data</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.MetricData">MetricData</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.NodePrediction">NodePrediction</h3>
+        <p>Represents a list of predicted metric data of a node</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>predicted_raw_data</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.MetricData">MetricData</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>is_scheduled</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.PodPrediction">PodPrediction</h3>
+        <p>Represents a list of predicted metrics data of a pod</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>namespaced_name</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.NamespacedName">NamespacedName</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>container_predictions</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.ContainerPrediction">ContainerPrediction</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.RecommendationPolicy">RecommendationPolicy</h3>
+        <p>Recommendation policy. A policy may be either stable or compact.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>RECOMMENDATIONPOLICY_UNDEFINED</td>
+                <td>0</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>STABLE</td>
+                <td>1</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>COMPACT</td>
+                <td>2</td>
+                <td><p></p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="alameda_api/v1alpha1/datahub/recommendation.proto">alameda_api/v1alpha1/datahub/recommendation.proto</h2><a href="#title">Top</a>
+      </div>
+      <p>This file has messages related to recommendations of containers, pods, and nodes</p>
+
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.AssignPodPolicy">AssignPodPolicy</h3>
+        <p>Represents a recommended pod-to-node assignment (i.e. pod placement)</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>time</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>node_priority</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.NodePriority">NodePriority</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>node_selector</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.Selector">Selector</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>node_name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.ContainerRecommendation">ContainerRecommendation</h3>
+        <p>Represents a resource configuration recommendation</p><p>It includes recommended limits and requests for the initial stage (a container which is just started) and after the initial stage</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>limit_recommendations</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.MetricData">MetricData</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>request_recommendations</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.MetricData">MetricData</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>initial_limit_recommendations</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.MetricData">MetricData</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>initial_request_recommendations</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.MetricData">MetricData</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.PodRecommendation">PodRecommendation</h3>
+        <p>Represents a set of container resource configuration recommenations of a pod</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>namespaced_name</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.NamespacedName">NamespacedName</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>apply_recommendation_now</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>assign_pod_policy</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.AssignPodPolicy">AssignPodPolicy</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>container_recommendations</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.ContainerRecommendation">ContainerRecommendation</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="alameda_api/v1alpha1/datahub/resource.proto">alameda_api/v1alpha1/datahub/resource.proto</h2><a href="#title">Top</a>
+      </div>
+      <p>This file has messages related to compute resources</p>
+
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.Container">Container</h3>
+        <p>Represents a container and its containing limit and requeset configurations</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>limit_resource</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.MetricData">MetricData</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>request_resource</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.MetricData">MetricData</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.Node">Node</h3>
+        <p>Represents a Kubernetes node</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.Pod">Pod</h3>
+        <p>Represents a Kubernetes pod</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>namespaced_name</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.NamespacedName">NamespacedName</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>resource_link</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>containers</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.Container">Container</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>is_alameda</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>alameda_scaler</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.NamespacedName">NamespacedName</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>node_name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>start_time</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>policy</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.RecommendationPolicy">RecommendationPolicy</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="alameda_api/v1alpha1/datahub/server.proto">alameda_api/v1alpha1/datahub/server.proto</h2><a href="#title">Top</a>
+      </div>
+      <p>This file has messages and services related to Federator.ai</p>
+
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.CreateAlamedaNodesRequest">CreateAlamedaNodesRequest</h3>
+        <p>Represents a request for adding nodes that need to be predicted</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>alameda_nodes</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.Node">Node</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.CreateNodePredictionsRequest">CreateNodePredictionsRequest</h3>
+        <p>Represents a request for creating predictions of a node metric data</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>node_predictions</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.NodePrediction">NodePrediction</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.CreatePodPredictionsRequest">CreatePodPredictionsRequest</h3>
+        <p>Represents a request for creating predictions of containers' metric data belonging to a pod</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>pod_predictions</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.PodPrediction">PodPrediction</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.CreatePodRecommendationsRequest">CreatePodRecommendationsRequest</h3>
+        <p>Represents a request for creating a pod's recommendation</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>pod_recommendations</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.PodRecommendation">PodRecommendation</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.CreatePodsRequest">CreatePodsRequest</h3>
+        <p>Represents a request for creating pods</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>pods</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.Pod">Pod</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.DeleteAlamedaNodesRequest">DeleteAlamedaNodesRequest</h3>
+        <p>Represents a request for stoping predicting nodes</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>alameda_nodes</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.Node">Node</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.DeletePodsRequest">DeletePodsRequest</h3>
+        <p>Represents a request for deleting pods data</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>pods</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.Pod">Pod</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.ListAlamedaPodsRequest">ListAlamedaPodsRequest</h3>
+        <p>Represents a request for listing pods that need to be predicted</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>alameda_scaler</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.NamespacedName">NamespacedName</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.ListNodeMetricsRequest">ListNodeMetricsRequest</h3>
+        <p>Represents a request for listing metric data of a node</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>node_names</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>time_range</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.TimeRange">TimeRange</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.ListNodeMetricsResponse">ListNodeMetricsResponse</h3>
+        <p>Represents a response for a listing node metrics request</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#google.rpc.Status">google.rpc.Status</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>node_metrics</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.NodeMetric">NodeMetric</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.ListNodePredictionsRequest">ListNodePredictionsRequest</h3>
+        <p>Represents a request for listing predictions of nodes</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>node_name</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>time_range</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.TimeRange">TimeRange</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.ListNodePredictionsResponse">ListNodePredictionsResponse</h3>
+        <p>Represents a response for a listing predictions of nodes request</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#google.rpc.Status">google.rpc.Status</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>node_predictions</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.NodePrediction">NodePrediction</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.ListNodesResponse">ListNodesResponse</h3>
+        <p>Represents a response for a listing nodes request</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#google.rpc.Status">google.rpc.Status</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>nodes</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.Node">Node</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.ListPodMetricsRequest">ListPodMetricsRequest</h3>
+        <p>Represents a request for listing metric data of a pod</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>namespaced_name</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.NamespacedName">NamespacedName</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>time_range</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.TimeRange">TimeRange</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.ListPodMetricsResponse">ListPodMetricsResponse</h3>
+        <p>Represents a response for a listing pod metric data request</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#google.rpc.Status">google.rpc.Status</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>pod_metrics</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.PodMetric">PodMetric</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.ListPodPredictionsRequest">ListPodPredictionsRequest</h3>
+        <p>Represents a request for listing predictions of pods</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>namespaced_name</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.NamespacedName">NamespacedName</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>time_range</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.TimeRange">TimeRange</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.ListPodPredictionsResponse">ListPodPredictionsResponse</h3>
+        <p>Represents a response for a listing predictions of pods request</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#google.rpc.Status">google.rpc.Status</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>pod_predictions</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.PodPrediction">PodPrediction</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.ListPodRecommendationsRequest">ListPodRecommendationsRequest</h3>
+        <p>Represents a request for listing recommendations of pods</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>namespaced_name</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.NamespacedName">NamespacedName</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>time_range</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.TimeRange">TimeRange</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.ListPodRecommendationsResponse">ListPodRecommendationsResponse</h3>
+        <p>Represents a response for listing pod recommendations request</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#google.rpc.Status">google.rpc.Status</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>pod_recommendations</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.PodRecommendation">PodRecommendation</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.ListPodsByNodeNameRequest">ListPodsByNodeNameRequest</h3>
+        <p>Represents a request for listing pods by a node name</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>node_name</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.ListPodsResponse">ListPodsResponse</h3>
+        <p>Represents a response for a listing pods request</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#google.rpc.Status">google.rpc.Status</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>pods</td>
+                  <td><a href="#containers_ai.alameda.v1alpha1.datahub.Pod">Pod</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+        
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="containers_ai.alameda.v1alpha1.datahub.DatahubService">DatahubService</h3>
+        <p>Service for providing data stored in the backend</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>ListPodMetrics</td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.ListPodMetricsRequest">ListPodMetricsRequest</a></td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.ListPodMetricsResponse">ListPodMetricsResponse</a></td>
+                <td><p>Used to list pod metric data</p></td>
+              </tr>
+            
+              <tr>
+                <td>ListNodeMetrics</td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.ListNodeMetricsRequest">ListNodeMetricsRequest</a></td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.ListNodeMetricsResponse">ListNodeMetricsResponse</a></td>
+                <td><p>Used to list node metric data</p></td>
+              </tr>
+            
+              <tr>
+                <td>ListAlamedaPods</td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.ListAlamedaPodsRequest">ListAlamedaPodsRequest</a></td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.ListPodsResponse">ListPodsResponse</a></td>
+                <td><p>Used to list pods need to be predicted</p></td>
+              </tr>
+            
+              <tr>
+                <td>ListAlamedaNodes</td>
+                <td><a href="#google.protobuf.Empty">.google.protobuf.Empty</a></td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.ListNodesResponse">ListNodesResponse</a></td>
+                <td><p>Used to list nodes need to be predicted</p></td>
+              </tr>
+            
+              <tr>
+                <td>ListPodPredictions</td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.ListPodPredictionsRequest">ListPodPredictionsRequest</a></td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.ListPodPredictionsResponse">ListPodPredictionsResponse</a></td>
+                <td><p>Used to list pod predictions</p></td>
+              </tr>
+            
+              <tr>
+                <td>ListNodePredictions</td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.ListNodePredictionsRequest">ListNodePredictionsRequest</a></td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.ListNodePredictionsResponse">ListNodePredictionsResponse</a></td>
+                <td><p>Used to list node predictions</p></td>
+              </tr>
+            
+              <tr>
+                <td>ListPodRecommendations</td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.ListPodRecommendationsRequest">ListPodRecommendationsRequest</a></td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.ListPodRecommendationsResponse">ListPodRecommendationsResponse</a></td>
+                <td><p>Used to list pod recommenations</p></td>
+              </tr>
+            
+              <tr>
+                <td>ListPodsByNodeName</td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.ListPodsByNodeNameRequest">ListPodsByNodeNameRequest</a></td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.ListPodsResponse">ListPodsResponse</a></td>
+                <td><p>Used to list pods by a node name</p></td>
+              </tr>
+            
+              <tr>
+                <td>CreatePods</td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.CreatePodsRequest">CreatePodsRequest</a></td>
+                <td><a href="#google.rpc.Status">.google.rpc.Status</a></td>
+                <td><p>Used to add pods that need to be predicted</p></td>
+              </tr>
+            
+              <tr>
+                <td>CreateAlamedaNodes</td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.CreateAlamedaNodesRequest">CreateAlamedaNodesRequest</a></td>
+                <td><a href="#google.rpc.Status">.google.rpc.Status</a></td>
+                <td><p>Used to add nodes that need to be predicted</p></td>
+              </tr>
+            
+              <tr>
+                <td>CreatePodPredictions</td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.CreatePodPredictionsRequest">CreatePodPredictionsRequest</a></td>
+                <td><a href="#google.rpc.Status">.google.rpc.Status</a></td>
+                <td><p>Used to create predictions of pods</p></td>
+              </tr>
+            
+              <tr>
+                <td>CreateNodePredictions</td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.CreateNodePredictionsRequest">CreateNodePredictionsRequest</a></td>
+                <td><a href="#google.rpc.Status">.google.rpc.Status</a></td>
+                <td><p>Used to create predictions of nodes</p></td>
+              </tr>
+            
+              <tr>
+                <td>CreatePodRecommendations</td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.CreatePodRecommendationsRequest">CreatePodRecommendationsRequest</a></td>
+                <td><a href="#google.rpc.Status">.google.rpc.Status</a></td>
+                <td><p>Used to create recommendations of pods</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeletePods</td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.DeletePodsRequest">DeletePodsRequest</a></td>
+                <td><a href="#google.rpc.Status">.google.rpc.Status</a></td>
+                <td><p>Used to delete info of pods</p></td>
+              </tr>
+            
+              <tr>
+                <td>DeleteAlamedaNodes</td>
+                <td><a href="#containers_ai.alameda.v1alpha1.datahub.DeleteAlamedaNodesRequest">DeleteAlamedaNodesRequest</a></td>
+                <td><a href="#google.rpc.Status">.google.rpc.Status</a></td>
+                <td><p>Used to stop generating predictions for the nodes</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
+    
+
+    <h2 id="scalar-value-types">Scalar Value Types</h2>
+    <table class="scalar-value-types-table">
+      <thead>
+        <tr><td>.proto Type</td><td>Notes</td><td>C++ Type</td><td>Java Type</td><td>Python Type</td></tr>
+      </thead>
+      <tbody>
+        
+          <tr id="double">
+            <td>double</td>
+            <td></td>
+            <td>double</td>
+            <td>double</td>
+            <td>float</td>
+          </tr>
+        
+          <tr id="float">
+            <td>float</td>
+            <td></td>
+            <td>float</td>
+            <td>float</td>
+            <td>float</td>
+          </tr>
+        
+          <tr id="int32">
+            <td>int32</td>
+            <td>Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint32 instead.</td>
+            <td>int32</td>
+            <td>int</td>
+            <td>int</td>
+          </tr>
+        
+          <tr id="int64">
+            <td>int64</td>
+            <td>Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint64 instead.</td>
+            <td>int64</td>
+            <td>long</td>
+            <td>int/long</td>
+          </tr>
+        
+          <tr id="uint32">
+            <td>uint32</td>
+            <td>Uses variable-length encoding.</td>
+            <td>uint32</td>
+            <td>int</td>
+            <td>int/long</td>
+          </tr>
+        
+          <tr id="uint64">
+            <td>uint64</td>
+            <td>Uses variable-length encoding.</td>
+            <td>uint64</td>
+            <td>long</td>
+            <td>int/long</td>
+          </tr>
+        
+          <tr id="sint32">
+            <td>sint32</td>
+            <td>Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int32s.</td>
+            <td>int32</td>
+            <td>int</td>
+            <td>int</td>
+          </tr>
+        
+          <tr id="sint64">
+            <td>sint64</td>
+            <td>Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int64s.</td>
+            <td>int64</td>
+            <td>long</td>
+            <td>int/long</td>
+          </tr>
+        
+          <tr id="fixed32">
+            <td>fixed32</td>
+            <td>Always four bytes. More efficient than uint32 if values are often greater than 2^28.</td>
+            <td>uint32</td>
+            <td>int</td>
+            <td>int</td>
+          </tr>
+        
+          <tr id="fixed64">
+            <td>fixed64</td>
+            <td>Always eight bytes. More efficient than uint64 if values are often greater than 2^56.</td>
+            <td>uint64</td>
+            <td>long</td>
+            <td>int/long</td>
+          </tr>
+        
+          <tr id="sfixed32">
+            <td>sfixed32</td>
+            <td>Always four bytes.</td>
+            <td>int32</td>
+            <td>int</td>
+            <td>int</td>
+          </tr>
+        
+          <tr id="sfixed64">
+            <td>sfixed64</td>
+            <td>Always eight bytes.</td>
+            <td>int64</td>
+            <td>long</td>
+            <td>int/long</td>
+          </tr>
+        
+          <tr id="bool">
+            <td>bool</td>
+            <td></td>
+            <td>bool</td>
+            <td>boolean</td>
+            <td>boolean</td>
+          </tr>
+        
+          <tr id="string">
+            <td>string</td>
+            <td>A string must always contain UTF-8 encoded or 7-bit ASCII text.</td>
+            <td>string</td>
+            <td>String</td>
+            <td>str/unicode</td>
+          </tr>
+        
+          <tr id="bytes">
+            <td>bytes</td>
+            <td>May contain any arbitrary sequence of bytes.</td>
+            <td>string</td>
+            <td>ByteString</td>
+            <td>str</td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </body>
+</html>
+

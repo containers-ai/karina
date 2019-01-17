@@ -1,0 +1,337 @@
+/// This file has messages related to Kubernetes metadata
+syntax = "proto3";
+
+package containersai.datahub.v1alpha2;
+
+import "google/rpc/status.proto";
+import "datahub/resource/metadata/v1alpha2/metadata.proto";
+import "datahub/resource/v1alpha2/resource.proto";
+import "datahub/prediction/v1alpha2/prediction.proto";
+import "datahub/metric/v1alpha2/metric.proto";
+import "datahub/recommendation/v1alpha2/recommendation.proto";
+import "datahub/score/v1alpha2/score.proto";
+
+option go_package = "github.com/containers-ai/api/datahub/v1alpha2";
+
+message QueryCondition {
+    containersai.datahub.metric.v1alpha2.TimeRange time_range = 1;
+    enum Order {
+        ASC = 0;
+        DESC = 1;
+    }
+    Order order = 2;
+    uint64 limit = 3;
+}
+
+/**
+ * Represents a request for listing metric data of pods
+ * 
+ */
+message ListPodMetricsRequest {
+    containersai.datahub.resource.metadata.v1alpha2.NamespacedName namespaced_name = 1;
+    QueryCondition query_condition = 2;
+}
+
+/**
+ * Represents a response for a listing metrics of pods request
+ * 
+ */
+message ListPodMetricsResponse {
+    google.rpc.Status status = 1;
+    repeated containersai.datahub.metric.v1alpha2.PodMetric pod_metrics = 2;
+}
+
+/**
+ * Represents a request for listing metrics of nodes
+ * 
+ */
+message ListNodeMetricsRequest {
+    repeated string node_names = 1;
+    QueryCondition query_condition = 2;
+}
+
+/**
+ * Represents a response for a listing metrics of nodes request
+ * 
+ */
+message ListNodeMetricsResponse {
+    google.rpc.Status status = 1;
+    repeated containersai.datahub.metric.v1alpha2.NodeMetric node_metrics = 2;
+}
+
+/**
+ * Represents a response for a listing pods request
+ * 
+ */
+message ListPodsResponse {
+    google.rpc.Status status = 1;
+    repeated containersai.datahub.resource.v1alpha2.Pod pods = 2;
+}
+
+/**
+ * Represents a request for listing pods
+ * 
+ */
+message ListPodsRequest {
+    containersai.datahub.resource.metadata.v1alpha2.NamespacedName scaler = 1;
+    bool is_predicted = 2;
+}
+
+/**
+ * Represents a request for listing nodes
+ * 
+ */
+message ListNodesRequest {
+    bool is_predicted = 1;
+}
+
+/**
+ * Represents a response for a listing nodes request
+ *
+ */
+message ListNodesResponse {
+    google.rpc.Status status = 1;
+    repeated containersai.datahub.resource.v1alpha2.Node nodes = 2;
+}
+
+/**
+ * Represents a request for listing predictions of pods
+ * 
+ */
+message ListPodPredictionsRequest {
+    containersai.datahub.resource.metadata.v1alpha2.NamespacedName namespaced_name = 1;
+    QueryCondition query_condition = 2;
+}
+
+/**
+ * Represents a response for a listing predictions of pods request
+ * 
+ */
+message ListPodPredictionsResponse {
+    google.rpc.Status status = 1;
+    repeated containersai.datahub.prediction.v1alpha2.PodPrediction pod_predictions = 2;
+}
+
+/**
+ * Represents a request for listing predictions of nodes
+ * 
+ */
+message ListNodePredictionsRequest {
+    repeated string node_names = 1;
+    QueryCondition query_condition = 2;
+}
+
+/**
+ * Represents a response for a listing predictions of nodes request
+ * 
+ */
+message ListNodePredictionsResponse {
+    google.rpc.Status status = 1;
+    repeated containersai.datahub.prediction.v1alpha2.NodePrediction node_predictions = 2;
+}
+
+/**
+ * Represents a request for listing recommendations of pods
+ * 
+ */
+message ListPodRecommendationsRequest {
+    containersai.datahub.resource.metadata.v1alpha2.NamespacedName namespaced_name = 1;
+    QueryCondition query_condition = 2;
+}
+
+/**
+ * Represents a response for listing pod recommendations request
+ * 
+ */
+message ListPodRecommendationsResponse {
+    google.rpc.Status status = 1;
+    repeated containersai.datahub.recommendation.v1alpha2.PodRecommendation pod_recommendations = 2;
+}
+
+/**
+ * Represents a request for listing system scores of pod scheduled on node
+ * 
+ */
+message ListSimulatedSchedulingScoresRequest {
+    QueryCondition query_condition = 1;
+}
+
+/**
+ * Represents a response for listing system scores request
+ * 
+ */
+message ListSimulatedSchedulingScoresResponse {
+    google.rpc.Status status = 1;
+    repeated containersai.datahub.score.v1alpha2.SimulatedSchedulingScore scores = 2;
+} 
+
+/**
+ * Represents a request for creating predictions of containers' metric data belonging to a pod
+ */
+message CreatePodPredictionsRequest {
+    repeated containersai.datahub.prediction.v1alpha2.PodPrediction pod_predictions = 1;
+}
+
+/**
+ * Represents a request for creating predictions of a node metric data
+ * 
+ */
+message CreateNodePredictionsRequest {
+    repeated containersai.datahub.prediction.v1alpha2.NodePrediction node_predictions = 1;
+}
+
+/**
+ * Represents a request for creating a pod's recommendation
+ * 
+ */
+message CreatePodRecommendationsRequest {
+    repeated containersai.datahub.recommendation.v1alpha2.PodRecommendation pod_recommendations = 1;
+}
+
+/**
+ * Represents a request for creating pods
+ * 
+ */
+message CreatePodsRequest {
+    repeated containersai.datahub.resource.v1alpha2.Pod pods = 1;
+}
+
+/**
+ * Represents a request for adding nodes
+ * 
+ */
+message CreateNodesRequest {
+    repeated containersai.datahub.resource.v1alpha2.Node nodes = 1;
+    bool is_predicted = 2;
+}
+
+/**
+ * Represents a request for adding scheduling scores produced by ai engine
+ * 
+ */
+message CreateSimulatedSchedulingScoresRequest {
+    repeated containersai.datahub.score.v1alpha2.SimulatedSchedulingScore scores = 1;
+}
+
+/**
+ * Represents a request for updating pods data
+ *
+ */
+message UpdatePodsRequest {
+    message UpdatedPod {
+        // namespace and name in containersai.datahub.resource.metadata.v1alpha2.NamespacedName are required
+        containersai.datahub.resource.metadata.v1alpha2.NamespacedName namespaced_name = 1;
+        message IsPredictedWrap {
+            bool is_predicted = 1;
+        }
+    }
+    repeated UpdatedPod updated_pods = 1;
+}
+
+/**
+ * Represents a request for upating nodes
+ *
+ */
+message UpdateNodesRequest {
+    message UpdatedNode {
+        // name is required
+        string name = 1;
+        message IsPredictedWrap {
+            bool is_predicted = 1;
+        }
+    }
+    repeated UpdatedNode updated_nodes = 1;
+}
+
+/**
+ * Represents a request for deleting pods data
+ * 
+ */
+message DeletePodsRequest {
+    repeated containersai.datahub.resource.v1alpha2.Pod pods = 1;
+}
+
+/**
+ * Represents a request for stoping nodes
+ * 
+ */
+message DeleteNodesRequest {
+    repeated containersai.datahub.resource.v1alpha2.Node nodes = 1;
+}
+
+/**
+ * Service for providing data stored in the backend
+ */
+service DatahubService {
+    /// Used to list pod metric data
+    rpc ListPodMetrics(ListPodMetricsRequest)
+        returns (ListPodMetricsResponse) {}
+
+    /// Used to list node metric data
+    rpc ListNodeMetrics(ListNodeMetricsRequest)
+        returns (ListNodeMetricsResponse) {}
+
+    // Used to list pods
+    rpc ListPods(ListPodsRequest)
+        returns (ListPodsResponse){}
+
+    // Used to list nodes
+    rpc ListNodes(ListNodesRequest)
+        returns (ListNodesResponse){}
+
+    /// Used to list pod predictions
+    rpc ListPodPredictions(ListPodPredictionsRequest)
+        returns (ListPodPredictionsResponse) {}
+
+    /// Used to list node predictions
+    rpc ListNodePredictions(ListNodePredictionsRequest)
+        returns (ListNodePredictionsResponse) {}
+
+    /// Used to list pod recommenations
+    rpc ListPodRecommendations(ListPodRecommendationsRequest)
+        returns (ListPodRecommendationsResponse) {}
+        
+    /// Used to list system scores
+    rpc ListSimulatedSchedulingScores(ListSimulatedSchedulingScoresRequest)
+        returns (ListSimulatedSchedulingScoresResponse) {} 
+
+    /// Used to add pods that need to be predicted
+    rpc CreatePods(CreatePodsRequest)
+        returns (google.rpc.Status){}
+    
+    /// Used to add nodes
+    rpc CreateNodes(CreateNodesRequest)
+        returns (google.rpc.Status){}
+
+    /// Used to create predictions of pods
+    rpc CreatePodPredictions(CreatePodPredictionsRequest)
+        returns (google.rpc.Status) {}
+
+    /// Used to create predictions of nodes
+    rpc CreateNodePredictions(CreateNodePredictionsRequest)
+        returns (google.rpc.Status) {}
+
+    /// Used to create recommendations of pods
+    rpc CreatePodRecommendations(CreatePodRecommendationsRequest)
+        returns (google.rpc.Status) {}
+
+    /// Used to create scores of system 
+    rpc CreateSimulatedSchedulingScores(CreateSimulatedSchedulingScoresRequest)
+        returns (google.rpc.Status) {} 
+
+    /// Used to update info of pods
+    rpc UpdatePods(UpdatePodsRequest)
+        returns (google.rpc.Status){}
+
+    /// Used to update info of nodes
+    rpc UpdateNodes(UpdateNodesRequest)
+        returns (google.rpc.Status){}
+
+    /// Used to delete info of pods
+    rpc DeletePods(DeletePodsRequest)
+        returns (google.rpc.Status){}
+
+    /// Used to delete info of nodes
+    rpc DeleteNodes(DeleteNodesRequest)
+        returns (google.rpc.Status){}            
+}

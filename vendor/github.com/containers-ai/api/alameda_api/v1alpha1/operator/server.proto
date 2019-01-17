@@ -1,0 +1,261 @@
+/// This file has messages related to the CRUD to Prometheus. This file will be deprated in v0.2.
+syntax = "proto3";
+
+package containers_ai.alameda.v1alpha1.operator;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/rpc/status.proto";
+
+/**
+ * Service for providing data stored in Prometheus
+ */
+service OperatorService {
+    /// Used to list metric data
+    rpc ListMetrics(ListMetricsRequest)
+        returns (ListMetricsResponse) {}
+
+    /// Used to list summation of metric data
+    rpc ListMetricsSum(ListMetricsSumRequest)
+        returns (ListMetricsSumResponse) {}
+
+    /// Used to requst for creating prediction results
+    rpc CreatePredictResult(CreatePredictResultRequest)
+        returns (CreatePredictResultResponse) {}
+
+    /// Used to get resource data
+    rpc GetResourceInfo(GetResourceInfoRequest)
+        returns (GetResourceInfoResponse) {}
+    
+    /// Used to get resource recommendation
+    rpc GetResourceRecommendation(GetResourceRecommendationRequest)
+        returns (GetResourceRecommendationResponse) {}
+}
+
+/**
+ * Metric type
+ */
+enum MetricType {
+    CONTAINER_CPU_USAGE_TOTAL = 0;
+    CONTAINER_CPU_USAGE_TOTAL_RATE = 1;
+    CONTAINER_MEMORY_USAGE = 2;
+    NODE_CPU_USAGE_SECONDS_AVG1M = 3;
+    NODE_MEMORY_USAGE_BYTES = 4;
+}
+
+/**
+ * Resource type. 
+ */
+enum ResourceType {
+    POD = 0;
+}
+
+enum StrOp {
+    EQUAL = 0;
+    NOT_EQUAL = 1;
+}
+
+/**
+ * Represents a time range definition
+ *
+ */
+message TimeRange {
+    google.protobuf.Timestamp start_time = 1;
+    google.protobuf.Timestamp end_time = 2;
+    google.protobuf.Duration step = 3;
+}
+
+/**
+ * Represents a Kubernetes label selector
+ *
+ */
+message LabelSelector {
+    string key = 1;
+    StrOp op = 2 ;
+    string value = 3;
+}
+
+/**
+ * Represents a data point of time-series metric data
+ *
+ */
+message Sample {
+    google.protobuf.Timestamp time = 1;
+    double value = 2;
+}
+
+/**
+ * Represents a data point of metric data
+ *
+ */
+message MetricResult {
+    map<string, string> labels = 1;
+    repeated Sample samples = 2;
+}
+
+/**
+ * Represents a request for listing metric data with the logically combined (AND) conditions 
+ */
+message ListMetricsRequest {
+    MetricType metric_type = 1;
+    oneof time_selector {
+        google.protobuf.Timestamp time = 2;
+        google.protobuf.Duration duration = 3;
+        TimeRange time_range = 4;
+    }
+    repeated LabelSelector conditions = 5;
+}
+
+/**
+ * Represents a response of a list metric data request
+ *
+ */
+message ListMetricsResponse {
+    repeated MetricResult metrics = 1;
+    google.rpc.Status status = 2;
+}
+
+/**
+ * Represents a request for listing metric data summation by grouping labels.
+ */
+message ListMetricsSumRequest {
+    MetricType metric_type = 1;
+    oneof time_selector {
+        google.protobuf.Timestamp time = 2;
+        google.protobuf.Duration duration = 3;
+        TimeRange time_range = 4;
+    }
+    repeated LabelSelector conditions = 5;
+    repeated string labels = 6;
+}
+
+/**
+ * Represents a response of a request for listing metric data summation by grouping labels
+ */
+message ListMetricsSumResponse {
+    repeated MetricResult metrics = 1;
+    google.rpc.Status status = 2;
+}
+
+/**
+ * Represents a request of getting info of a resource type
+ */
+message GetResourceInfoRequest {
+    ResourceType type = 1;
+    string namespace = 2;
+    string name = 3;
+}
+
+/**
+ * Represents a request of getting recommendation of a resource type
+ */
+message GetResourceRecommendationRequest {
+    ResourceType type = 1;
+    string namespace = 2;
+    string name = 3;
+}
+
+/**
+ * Represents a resource configuration including limits and requests
+ */
+message Resource {
+    map<string,string> limit = 1;
+    map<string,string> request = 2;
+}
+
+/**
+ * Represents a resource configuration recommenation
+ */
+message Recommendation {
+    google.protobuf.Timestamp time = 1;
+    Resource resource = 2;
+}
+
+/**
+ * Represents a predicted value
+ */
+message PredictData {
+    google.protobuf.Timestamp time = 1;
+    string value = 2;
+}
+
+/**
+ * Represents a predicted value of time-series data
+ */
+message TimeSeriesData {
+    repeated PredictData predict_data = 1;
+}
+
+/**
+ * Represents predictions and recommendations  for a container
+ */
+message PredictContainer {
+    string name = 1;
+    map<string, TimeSeriesData> raw_predict_data = 2;
+    repeated Recommendation recommendations = 3;
+    Resource initial_resource = 4;
+}
+
+/**
+ * Represents predictions and recommendations of a pod
+ */
+message PredictPod {
+    string uid = 1;
+    string namespace = 2;
+    string name = 3;
+    repeated PredictContainer predict_containers = 4;
+}
+
+/**
+ * Represents a container
+ */
+message Container {
+    string name = 1;
+    Resource resource = 2;
+    Resource initial_resource = 3;
+}
+
+/**
+ * Represents containers of a pod
+ */
+message PodInfo {
+    repeated Container containers = 1;
+}
+
+/**
+ * Represents a request for generating predictions for pods
+ */
+message CreatePredictResultRequest {
+    repeated PredictPod predict_pods = 1;
+}
+
+/**
+ * Represents a response of a creating pod prediction request
+ */
+message CreatePredictResultResponse {
+    google.rpc.Status status = 1;
+}
+
+/**
+ * Represents a response of getting resource info
+ */
+message GetResourceInfoResponse {
+    google.rpc.Status status = 1;
+    ResourceType type = 2;
+    string uid = 3;
+    string namespace = 4;
+    string name = 5;
+    PodInfo pod_info = 6;
+}
+
+/**
+ * Represents a response of getting resource recommendation
+ */
+message GetResourceRecommendationResponse {
+    google.rpc.Status status = 1;
+    ResourceType type = 2;
+    string uid = 3;
+    string namespace = 4;
+    string name = 5;
+    PodInfo pod_info = 6;
+}

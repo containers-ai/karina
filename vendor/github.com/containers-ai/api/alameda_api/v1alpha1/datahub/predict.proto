@@ -1,0 +1,41 @@
+/// This file has messages related to predictions of containers, pods, and nodes
+syntax = "proto3";
+
+package containers_ai.alameda.v1alpha1.datahub;
+
+import "alameda_api/v1alpha1/datahub/metadata.proto";
+import "alameda_api/v1alpha1/datahub/metric.proto";
+
+/**
+ *  Recommendation policy. A policy may be either stable or compact.
+ */
+enum RecommendationPolicy {
+    RECOMMENDATIONPOLICY_UNDEFINED = 0;
+    STABLE = 1;
+    COMPACT = 2;
+}
+
+/**
+ * Represents a list of predicted metric data of a container
+ */
+message ContainerPrediction {
+    string name = 1;
+    repeated MetricData predicted_raw_data = 2;
+}
+
+/**
+ * Represents a list of predicted metrics data of a pod
+ */
+message PodPrediction {
+    NamespacedName namespaced_name = 1;
+    repeated ContainerPrediction container_predictions = 2;
+}
+
+/**
+ * Represents a list of predicted metric data of a node
+ */
+message NodePrediction {
+    string name = 1;
+    repeated MetricData predicted_raw_data = 2;
+    bool is_scheduled =3;
+}

@@ -1,0 +1,42 @@
+/// This file has messages related to compute resources
+syntax = "proto3";
+
+package containers_ai.alameda.v1alpha1.datahub;
+
+import "alameda_api/v1alpha1/datahub/predict.proto";
+import "google/protobuf/timestamp.proto";
+import "alameda_api/v1alpha1/datahub/metadata.proto";
+import "alameda_api/v1alpha1/datahub/metric.proto";
+
+/**
+ * Represents a container and its containing limit and requeset configurations
+ * 
+ */
+message Container {
+    string name = 1;
+    repeated MetricData limit_resource = 2;
+    repeated MetricData request_resource = 3;
+}
+
+/**
+ * Represents a Kubernetes pod
+ * 
+ */
+message Pod {
+    NamespacedName namespaced_name = 1;
+    string resource_link = 2;
+    repeated Container containers = 3;
+    bool is_alameda = 4;
+    NamespacedName alameda_scaler = 5;
+    string node_name = 6;
+    google.protobuf.Timestamp start_time = 7;
+    RecommendationPolicy policy = 8;
+}
+
+/**
+ * Represents a Kubernetes node
+ * 
+ */
+message Node {
+    string name = 1;
+}

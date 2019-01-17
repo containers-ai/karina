@@ -1,0 +1,36 @@
+/// This file has messages related to predictions of containers, pods, and nodes
+syntax = "proto3";
+
+package containersai.datahub.prediction.v1alpha2;
+
+import "datahub/resource/metadata/v1alpha2/metadata.proto";
+import "datahub/metric/v1alpha2/metric.proto";
+
+option go_package = "github.com/containers-ai/api/datahub/prediction/v1alpha2";
+
+/**
+ * Represents a list of predicted metric data of a container
+ */
+message ContainerPrediction {
+    string name = 1;
+    // use containersai.datahub.metric.v1alpha2.MetricType as key
+    map<int32, containersai.datahub.metric.v1alpha2.MetricData> predicted_raw_data = 2;
+}
+
+/**
+ * Represents a list of predicted metrics data of a pod
+ */
+message PodPrediction {
+    containersai.datahub.resource.metadata.v1alpha2.NamespacedName namespaced_name = 1;
+    repeated ContainerPrediction container_predictions = 2;
+}
+
+/**
+ * Represents a list of predicted metric data of a node
+ */
+message NodePrediction {
+    string name = 1;
+    // use containersai.datahub.metric.v1alpha2.MetricType as key
+    map<int32, containersai.datahub.metric.v1alpha2.MetricData> predicted_raw_data = 2;
+    bool is_scheduled =3;
+}

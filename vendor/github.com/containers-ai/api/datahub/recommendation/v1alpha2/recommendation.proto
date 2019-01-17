@@ -1,0 +1,62 @@
+/// This file has messages related to recommendations of containers, pods, and nodes
+syntax = "proto3";
+
+package containersai.datahub.recommendation.v1alpha2;
+
+import "google/protobuf/timestamp.proto";
+import "datahub/resource/metadata/v1alpha2/metadata.proto";
+import "datahub/resource/pod/assign/v1alpha2/assign.proto";
+import "datahub/metric/v1alpha2/metric.proto";
+
+option go_package = "github.com/containers-ai/api/datahub/recommendation/v1alpha2";
+
+/**
+ *  Recommendation policy. A policy may be either stable or compact.
+ */
+enum RecommendationPolicy {
+    RECOMMENDATIONPOLICY_UNDEFINED = 0;
+    STABLE = 1;
+    COMPACT = 2;
+}
+
+/**
+ * Represents a resource configuration recommendation
+ * 
+ * It includes recommended limits and requests for the initial stage (a container which is just started) and after the initial stage
+ *
+ */
+message ContainerRecommendation {
+    string name = 1;
+    // use containersai.datahub.metric.v1alpha2.MetricType as key
+    map<int32, containersai.datahub.metric.v1alpha2.MetricData> limit_recommendations = 2;
+    // use containersai.datahub.metric.v1alpha2.MetricType as key
+    map<int32, containersai.datahub.metric.v1alpha2.MetricData> request_recommendations = 3;
+    // use containersai.datahub.metric.v1alpha2.MetricType as key
+    map<int32, containersai.datahub.metric.v1alpha2.MetricData> initial_limit_recommendations = 4;
+    // use containersai.datahub.metric.v1alpha2.MetricType as key
+    map<int32, containersai.datahub.metric.v1alpha2.MetricData> initial_request_recommendations = 5;
+}
+
+/**
+ * Represents a recommended pod-to-node assignment (i.e. pod placement)
+ * 
+ */
+message AssignPodPolicy {
+    google.protobuf.Timestamp time = 1;
+    oneof policy {
+        containersai.datahub.resource.pod.assign.v1alpha2.NodePriority node_priority = 2;
+        containersai.datahub.resource.pod.assign.v1alpha2.Selector node_selector = 3;
+        string node_name = 4;
+    };
+}
+
+/**
+ * Represents a set of container resource configuration recommenations of a pod
+ * 
+ */
+message PodRecommendation {
+    containersai.datahub.resource.metadata.v1alpha2.NamespacedName namespaced_name = 1;
+    bool apply_recommendation_now = 2;
+    AssignPodPolicy assign_pod_policy = 3;
+    repeated ContainerRecommendation container_recommendations = 4;
+}
