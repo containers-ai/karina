@@ -23,7 +23,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='containersai.datahub.resource.v1alpha2',
   syntax='proto3',
   serialized_options=_b('Z6github.com/containers-ai/api/datahub/resource/v1alpha2'),
-  serialized_pb=_b('\n(datahub/resource/v1alpha2/resource.proto\x12&containersai.datahub.resource.v1alpha2\x1a\x31\x64\x61tahub/resource/metadata/v1alpha2/metadata.proto\x1a\x34\x64\x61tahub/recommendation/v1alpha2/recommendation.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a$datahub/metric/v1alpha2/metric.proto\"\xab\x03\n\tContainer\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\\\n\x0elimit_resource\x18\x02 \x03(\x0b\x32\x44.containersai.datahub.resource.v1alpha2.Container.LimitResourceEntry\x12`\n\x10request_resource\x18\x03 \x03(\x0b\x32\x46.containersai.datahub.resource.v1alpha2.Container.RequestResourceEntry\x1a\x66\n\x12LimitResourceEntry\x12\x0b\n\x03key\x18\x01 \x01(\x05\x12?\n\x05value\x18\x02 \x01(\x0b\x32\x30.containersai.datahub.metric.v1alpha2.MetricData:\x02\x38\x01\x1ah\n\x14RequestResourceEntry\x12\x0b\n\x03key\x18\x01 \x01(\x05\x12?\n\x05value\x18\x02 \x01(\x0b\x32\x30.containersai.datahub.metric.v1alpha2.MetricData:\x02\x38\x01\"\xbb\x03\n\x03Pod\x12X\n\x0fnamespaced_name\x18\x01 \x01(\x0b\x32?.containersai.datahub.resource.metadata.v1alpha2.NamespacedName\x12\x15\n\rresource_link\x18\x02 \x01(\t\x12\x45\n\ncontainers\x18\x03 \x03(\x0b\x32\x31.containersai.datahub.resource.v1alpha2.Container\x12\x14\n\x0cis_predicted\x18\x04 \x01(\x08\x12O\n\x06scaler\x18\x05 \x01(\x0b\x32?.containersai.datahub.resource.metadata.v1alpha2.NamespacedName\x12\x11\n\tnode_name\x18\x06 \x01(\t\x12.\n\nstart_time\x18\x07 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12R\n\x06policy\x18\x08 \x01(\x0e\x32\x42.containersai.datahub.recommendation.v1alpha2.RecommendationPolicy\"\x14\n\x04Node\x12\x0c\n\x04name\x18\x01 \x01(\tB8Z6github.com/containers-ai/api/datahub/resource/v1alpha2b\x06proto3')
+  serialized_pb=_b('\n(datahub/resource/v1alpha2/resource.proto\x12&containersai.datahub.resource.v1alpha2\x1a\x31\x64\x61tahub/resource/metadata/v1alpha2/metadata.proto\x1a\x34\x64\x61tahub/recommendation/v1alpha2/recommendation.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a$datahub/metric/v1alpha2/metric.proto\"\xab\x03\n\tContainer\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\\\n\x0elimit_resource\x18\x02 \x03(\x0b\x32\x44.containersai.datahub.resource.v1alpha2.Container.LimitResourceEntry\x12`\n\x10request_resource\x18\x03 \x03(\x0b\x32\x46.containersai.datahub.resource.v1alpha2.Container.RequestResourceEntry\x1a\x66\n\x12LimitResourceEntry\x12\x0b\n\x03key\x18\x01 \x01(\x05\x12?\n\x05value\x18\x02 \x01(\x0b\x32\x30.containersai.datahub.metric.v1alpha2.MetricData:\x02\x38\x01\x1ah\n\x14RequestResourceEntry\x12\x0b\n\x03key\x18\x01 \x01(\x05\x12?\n\x05value\x18\x02 \x01(\x0b\x32\x30.containersai.datahub.metric.v1alpha2.MetricData:\x02\x38\x01\"\xbb\x03\n\x03Pod\x12X\n\x0fnamespaced_name\x18\x01 \x01(\x0b\x32?.containersai.datahub.resource.metadata.v1alpha2.NamespacedName\x12\x15\n\rresource_link\x18\x02 \x01(\t\x12\x45\n\ncontainers\x18\x03 \x03(\x0b\x32\x31.containersai.datahub.resource.v1alpha2.Container\x12\x14\n\x0cis_predicted\x18\x04 \x01(\x08\x12O\n\x06scaler\x18\x05 \x01(\x0b\x32?.containersai.datahub.resource.metadata.v1alpha2.NamespacedName\x12\x11\n\tnode_name\x18\x06 \x01(\t\x12.\n\nstart_time\x18\x07 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12R\n\x06policy\x18\x08 \x01(\x0e\x32\x42.containersai.datahub.recommendation.v1alpha2.RecommendationPolicy\"*\n\x04Node\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x14\n\x0cis_predicted\x18\x02 \x01(\x08\x42\x38Z6github.com/containers-ai/api/datahub/resource/v1alpha2b\x06proto3')
   ,
   dependencies=[datahub_dot_resource_dot_metadata_dot_v1alpha2_dot_metadata__pb2.DESCRIPTOR,datahub_dot_recommendation_dot_v1alpha2_dot_recommendation__pb2.DESCRIPTOR,google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,datahub_dot_metric_dot_v1alpha2_dot_metric__pb2.DESCRIPTOR,])
 
@@ -243,6 +243,13 @@ _NODE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='is_predicted', full_name='containersai.datahub.resource.v1alpha2.Node.is_predicted', index=1,
+      number=2, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -256,7 +263,7 @@ _NODE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=1136,
-  serialized_end=1156,
+  serialized_end=1178,
 )
 
 _CONTAINER_LIMITRESOURCEENTRY.fields_by_name['value'].message_type = datahub_dot_metric_dot_v1alpha2_dot_metric__pb2._METRICDATA

@@ -202,7 +202,6 @@ message CreatePodsRequest {
  */
 message CreateNodesRequest {
     repeated containersai.datahub.resource.v1alpha2.Node nodes = 1;
-    bool is_predicted = 2;
 }
 
 /**
@@ -224,6 +223,7 @@ message UpdatePodsRequest {
         message IsPredictedWrap {
             bool is_predicted = 1;
         }
+        IsPredictedWrap is_predicted = 2;
     }
     repeated UpdatedPod updated_pods = 1;
 }
@@ -239,6 +239,7 @@ message UpdateNodesRequest {
         message IsPredictedWrap {
             bool is_predicted = 1;
         }
+        IsPredictedWrap is_predicted = 2;
     }
     repeated UpdatedNode updated_nodes = 1;
 }

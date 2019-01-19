@@ -43,4 +43,5 @@ message Pod {
  */
 message Node {
     string name = 1;
+    bool is_predicted = 2;
 }

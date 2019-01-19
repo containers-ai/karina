@@ -1,0 +1,17 @@
+
+bind-address: ":50050"
+
+prometheus:
+  url: "https://prometheus-k8s.openshift-monitoring:9091"
+  tls-config:
+    insecure-skip-verify: true
+  bearer-token-file: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+
+influxdb:
+  address: "https://influxdb.karina.svc.cluster.local:8086"
+  username: "karina"
+  password: "karina"
+    
+log:
+  set-logcallers: true
+  output-level: "debug" # debug, info, warn, error, fatal, none
