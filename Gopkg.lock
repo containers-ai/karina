@@ -19,7 +19,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:335810218b56eb8b1b99a683d2604fb42af80957d249b9dcd73e28f1b398b49b"
+  digest = "1:1bb617e48a28ea294de17ee79aad75049ee59bb264f3ea311d1137aa2881e27a"
   name = "github.com/containers-ai/api"
   packages = [
     "datahub/metric/v1alpha2",
@@ -32,7 +32,7 @@
     "datahub/v1alpha2",
   ]
   pruneopts = "T"
-  revision = "8a3dfb877c06784a34b8bd2fc395a6c97770b363"
+  revision = "e96f34490be6566a9ac4f42a5906d1a169735d53"
 
 [[projects]]
   digest = "1:9f42202ac457c462ad8bb9642806d275af9ab4850cf0b1960b9c6f083d4a309a"
@@ -43,15 +43,15 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:0ffd93121f3971aea43f6a26b3eaaa64c8af20fb0ff0731087d8dab7164af5a8"
+  digest = "1:77b39b37b35255582ec2c661b9c49c46356bf9fd5156442b400ef0608c358023"
   name = "github.com/emicklei/go-restful"
   packages = [
     ".",
     "log",
   ]
   pruneopts = "T"
-  revision = "3eb9738c1697594ea6e71a7156a9bb32ed216cf0"
-  version = "v2.8.0"
+  revision = "e37671aced663c8d3a395bd301857e26dcf4340c"
+  version = "v2.8.1"
 
 [[projects]]
   digest = "1:7fc160b460a6fc506b37fcca68332464c3f2cd57b6e3f111f26c5bbfd2d5518e"
@@ -125,6 +125,7 @@
   name = "github.com/golang/protobuf"
   packages = [
     "proto",
+    "protoc-gen-go/descriptor",
     "ptypes",
     "ptypes/any",
     "ptypes/duration",
@@ -240,6 +241,28 @@
   pruneopts = "T"
   revision = "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75"
   version = "v1.0"
+
+[[projects]]
+  digest = "1:33d5bfaa060b4be1901903c0a4c975f377c3ae271de996a30b892cc53e019d34"
+  name = "github.com/influxdata/influxdb"
+  packages = [
+    "client/v2",
+    "models",
+    "pkg/escape",
+  ]
+  pruneopts = "T"
+  revision = "698dbc789aff13c2678357a6b93ff73dd7136571"
+  version = "v1.7.3"
+
+[[projects]]
+  digest = "1:dce89a23d5e3b147ba2cb39e659e85f53a72cff74f7ec61da30f3154a3848f3d"
+  name = "github.com/influxdata/platform"
+  packages = [
+    "models",
+    "pkg/escape",
+  ]
+  pruneopts = "T"
+  revision = "0f79e4ea3248354c789cba274542e0a8e55971db"
 
 [[projects]]
   digest = "1:ee5840274624ad20cac08227aeca582fbdaf3727ef9dd37ae935706240679e09"
@@ -437,7 +460,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:7a4fed4f3801ef4c2f53054230ee75d1f62df4e2a6fab049ca6213c793e386d8"
+  digest = "1:c98dc89f971cf954d22a78ac61cdaf4be91ec53852fe90cf86f1314a8afd6f46"
   name = "github.com/prometheus/procfs"
   packages = [
     ".",
@@ -446,7 +469,7 @@
     "xfs",
   ]
   pruneopts = "T"
-  revision = "b1a0a9a36d7453ba0f62578b99712f3a6c5f82d1"
+  revision = "bf6a532e95b1f7a62adf0ab5050a5bb2237ad2f4"
 
 [[projects]]
   digest = "1:7ed87796a9e0b0310847cde3303fc3de3f0d04a110ca56f85b8674a1f3ba48f4"
@@ -641,7 +664,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:ddb7e9f7d968a4ef6c8204badc6b56d5e1b5ab033e7455e3a325309403fd70ea"
+  digest = "1:815eb2c2de054bc14e4c956ab34fe4335e192b32362c78aaf2da7c6df1978513"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
@@ -657,7 +680,7 @@
     "internal/semver",
   ]
   pruneopts = "T"
-  revision = "b258f6da23835bf37e95cc50af792447c7c67fe4"
+  revision = "16909d206f00da7d0d5ba28cd9dc7fb223648ecf"
 
 [[projects]]
   digest = "1:1469235a5a8e192cfe6a99c4804b883a02f0ff96a693cd1660515a3a3b94d5ac"
@@ -718,6 +741,8 @@
     "metadata",
     "naming",
     "peer",
+    "reflection",
+    "reflection/grpc_reflection_v1alpha",
     "resolver",
     "resolver/dns",
     "resolver/passthrough",
@@ -1087,12 +1112,16 @@
   analyzer-version = 1
   input-imports = [
     "github.com/containers-ai/api/datahub/metric/v1alpha2",
+    "github.com/containers-ai/api/datahub/prediction/v1alpha2",
     "github.com/containers-ai/api/datahub/recommendation/v1alpha2",
     "github.com/containers-ai/api/datahub/resource/metadata/v1alpha2",
     "github.com/containers-ai/api/datahub/resource/v1alpha2",
+    "github.com/containers-ai/api/datahub/score/v1alpha2",
     "github.com/containers-ai/api/datahub/v1alpha2",
     "github.com/emicklei/go-restful",
+    "github.com/golang/protobuf/ptypes",
     "github.com/golang/protobuf/ptypes/timestamp",
+    "github.com/influxdata/influxdb/client/v2",
     "github.com/onsi/ginkgo",
     "github.com/onsi/gomega",
     "github.com/spf13/cobra",
@@ -1102,8 +1131,10 @@
     "go.uber.org/zap/zapgrpc",
     "golang.org/x/net/context",
     "google.golang.org/genproto/googleapis/rpc/code",
+    "google.golang.org/genproto/googleapis/rpc/status",
     "google.golang.org/grpc",
     "google.golang.org/grpc/grpclog",
+    "google.golang.org/grpc/reflection",
     "gopkg.in/natefinch/lumberjack.v2",
     "k8s.io/api/apps/v1",
     "k8s.io/api/core/v1",

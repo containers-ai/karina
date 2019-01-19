@@ -1,0 +1,3 @@
+CREATE DATABASE karina_cluster_status
+CREATE DATABASE karina_recommendation
+CREATE DATABASE karina_prediction
