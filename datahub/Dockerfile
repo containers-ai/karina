@@ -11,7 +11,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o ./datahub/datahub githu
 # Copy the controller-manager into a thin image
 FROM alpine:latest
 WORKDIR /root/
-COPY --from=builder /go/src/github.com/containers-ai/karina/datahub/etc/datahub.yml /etc/karina/datahub/datahub.yml
+COPY --from=builder /go/src/github.com/containers-ai/karina/datahub/etc/datahub.yml /etc/federatorai/datahub/datahub.yml
 COPY --from=builder /go/src/github.com/containers-ai/karina/datahub/datahub .
 EXPOSE 50050/tcp
 ENTRYPOINT ["./datahub"]
