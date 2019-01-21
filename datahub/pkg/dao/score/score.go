@@ -2,6 +2,8 @@ package score
 
 import (
 	"time"
+
+	"github.com/containers-ai/karina/datahub/pkg/dao"
 )
 
 // DAO DAO interface of score
@@ -19,6 +21,5 @@ type SimulatedSchedulingScore struct {
 
 // ListRequest Request argument for list api.
 type ListRequest struct {
-	StartTime *time.Time
-	EndTime   *time.Time
+	dao.QueryCondition
 }

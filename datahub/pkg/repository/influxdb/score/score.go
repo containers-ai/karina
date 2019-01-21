@@ -2,10 +2,6 @@ package score
 
 import (
 	"errors"
-	"fmt"
-	"strconv"
-	"strings"
-	"time"
 
 	score_dao "github.com/containers-ai/karina/datahub/pkg/dao/score"
 	influxdb_entity_score "github.com/containers-ai/karina/datahub/pkg/entity/influxdb/score"
@@ -25,30 +21,34 @@ func NewRepositoryWithConfig(cfg influxdb.Config) SimulatedSchedulingScoreReposi
 	}
 }
 
-// ListScoresBetweenTimes List simulated_scheduling_score data points that it's timestamp is between startTime and endTime in influxdb
-func (r SimulatedSchedulingScoreRepository) ListScoresBetweenTimes(startTime, endTime *time.Time) ([]*influxdb_entity_score.SimulatedSchedulingScoreEntity, error) {
+// ListScoresByRequest List scores from influxDB
+func (r SimulatedSchedulingScoreRepository) ListScoresByRequest(request score_dao.ListRequest) ([]*influxdb_entity_score.SimulatedSchedulingScoreEntity, error) {
 
 	var (
 		err error
 
-		cmd       string
-		cmdSuffix string
-
+		results      []influxdb_client.Result
 		influxdbRows []*influxdb.InfluxDBRow
-
-		scores = make([]*influxdb_entity_score.SimulatedSchedulingScoreEntity, 0)
+		scores       = make([]*influxdb_entity_score.SimulatedSchedulingScoreEntity, 0)
 	)
 
-	lastClause, whereTimeClause := buildTimeClause(startTime, endTime)
-	if whereTimeClause != "" {
-		whereTimeClause = strings.TrimSuffix(whereTimeClause, "and ")
-		cmdSuffix = fmt.Sprintf("where %s", whereTimeClause)
-	} else {
-		cmdSuffix = lastClause
+	influxdbStatement := influxdb.Statement{
+		Measurement: SimulatedSchedulingScore,
 	}
 
-	cmd = fmt.Sprintf(`select * from %s %s`, string(SimulatedSchedulingScore), cmdSuffix)
-	results, err := r.influxDB.QueryDB(cmd, string(influxdb.Score))
+	queryCondition := influxdb.QueryCondition{
+		StartTime:      request.QueryCondition.StartTime,
+		EndTime:        request.QueryCondition.EndTime,
+		StepTime:       request.QueryCondition.StepTime,
+		TimestampOrder: request.QueryCondition.TimestampOrder,
+		Limit:          request.QueryCondition.Limit,
+	}
+	influxdbStatement.AppendTimeConditionIntoWhereClause(queryCondition)
+	influxdbStatement.SetLimitClauseFromQueryCondition(queryCondition)
+	influxdbStatement.SetOrderClauseFromQueryCondition(queryCondition)
+	cmd := influxdbStatement.BuildQueryCmd()
+
+	results, err = r.influxDB.QueryDB(cmd, string(influxdb.Score))
 	if err != nil {
 		return scores, errors.New("SimulatedSchedulingScoreRepository list scores failed: " + err.Error())
 	}
@@ -62,6 +62,7 @@ func (r SimulatedSchedulingScoreRepository) ListScoresBetweenTimes(startTime, en
 	}
 
 	return scores, nil
+
 }
 
 // CreateScores Create simulated_scheduling_score data points into influxdb
@@ -99,33 +100,4 @@ func (r SimulatedSchedulingScoreRepository) CreateScores(scores []*score_dao.Sim
 	}
 
 	return nil
-}
-
-func buildTimeClause(ptrStartTime, ptrEndTime *time.Time) (string, string) {
-
-	var (
-		lastClause      string
-		whereTimeClause string
-
-		startTime = time.Now()
-	)
-
-	if ptrStartTime == nil && ptrEndTime == nil {
-		lastClause = "order by time desc limit 1"
-	} else {
-
-		if ptrStartTime != nil {
-			startTime = *ptrStartTime
-		}
-
-		nanoTimestampInString := strconv.FormatInt(int64(startTime.UnixNano()), 10)
-		whereTimeClause = fmt.Sprintf("time > %s and ", nanoTimestampInString)
-
-		if ptrEndTime != nil {
-			nanoTimestampInString := strconv.FormatInt(int64(ptrEndTime.UnixNano()), 10)
-			whereTimeClause += fmt.Sprintf("time <= %s and ", nanoTimestampInString)
-		}
-	}
-
-	return lastClause, whereTimeClause
 }

@@ -1,15 +1,15 @@
 package datahub
 
 import (
-	"errors"
 	"time"
 
 	datahub_metric_v1alpha2 "github.com/containers-ai/api/datahub/metric/v1alpha2"
 	datahub_v1alpha2 "github.com/containers-ai/api/datahub/v1alpha2"
+	"github.com/containers-ai/karina/datahub/pkg/dao"
 	prediction_dao "github.com/containers-ai/karina/datahub/pkg/dao/prediction"
+	score_dao "github.com/containers-ai/karina/datahub/pkg/dao/score"
 	"github.com/containers-ai/karina/datahub/pkg/metric"
 	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/timestamp"
 )
 
 type datahubListPodMetricsRequestExtended struct {
@@ -17,25 +17,6 @@ type datahubListPodMetricsRequestExtended struct {
 }
 
 func (r datahubListPodMetricsRequestExtended) validate() error {
-
-	var (
-		startTime *timestamp.Timestamp
-		endTime   *timestamp.Timestamp
-	)
-
-	if r.GetQueryCondition() == nil && r.GetQueryCondition().GetTimeRange() == nil {
-		return errors.New("field \"time_range\" cannot be empty")
-	}
-
-	startTime = r.GetQueryCondition().GetTimeRange().StartTime
-	endTime = r.GetQueryCondition().GetTimeRange().EndTime
-	if startTime == nil || endTime == nil {
-		return errors.New("field \"start_time\" and \"end_time\"  cannot be empty")
-	}
-
-	if startTime.Seconds+int64(startTime.Nanos) >= endTime.Seconds+int64(endTime.Nanos) {
-		return errors.New("\"end_time\" must not be before \"start_time\"")
-	}
 
 	return nil
 }
@@ -45,25 +26,6 @@ type datahubListNodeMetricsRequestExtended struct {
 }
 
 func (r datahubListNodeMetricsRequestExtended) validate() error {
-
-	var (
-		startTime *timestamp.Timestamp
-		endTime   *timestamp.Timestamp
-	)
-
-	if r.GetQueryCondition() != nil && r.GetQueryCondition().GetTimeRange() != nil {
-		return errors.New("field \"time_range\" cannot be empty")
-	}
-
-	startTime = r.GetQueryCondition().GetTimeRange().StartTime
-	endTime = r.GetQueryCondition().GetTimeRange().EndTime
-	if startTime == nil || endTime == nil {
-		return errors.New("field \"start_time\" and \"end_time\"  cannot be empty")
-	}
-
-	if startTime.Seconds+int64(startTime.Nanos) >= endTime.Seconds+int64(endTime.Nanos) {
-		return errors.New("\"end_time\" must not be before \"start_time\"")
-	}
 
 	return nil
 }
@@ -190,16 +152,15 @@ func (r datahubCreateNodePredictionsRequestExtended) daoNodePredictions() []*pre
 }
 
 type datahubListPodPredictionsRequestExtended struct {
-	datahub_v1alpha2.ListPodPredictionsRequest
+	*datahub_v1alpha2.ListPodPredictionsRequest
 }
 
 func (r datahubListPodPredictionsRequestExtended) daoListPodPredictionsRequest() prediction_dao.ListPodPredictionsRequest {
 
 	var (
-		namespace string
-		podName   string
-		startTime *time.Time
-		endTime   *time.Time
+		namespace      string
+		podName        string
+		queryCondition dao.QueryCondition
 	)
 
 	if r.GetNamespacedName() != nil {
@@ -207,63 +168,165 @@ func (r datahubListPodPredictionsRequestExtended) daoListPodPredictionsRequest()
 		podName = r.GetNamespacedName().GetName()
 	}
 
-	if r.GetQueryCondition() != nil && r.GetQueryCondition().GetTimeRange() != nil {
-
-		if r.GetQueryCondition().GetTimeRange().GetStartTime() != nil {
-			tmpStartTime, _ := ptypes.Timestamp(r.GetQueryCondition().GetTimeRange().GetStartTime())
-			startTime = &tmpStartTime
-		}
-
-		if r.GetQueryCondition().GetTimeRange().GetEndTime() != nil {
-			tmpEndTime, _ := ptypes.Timestamp(r.GetQueryCondition().GetTimeRange().GetEndTime())
-			endTime = &tmpEndTime
-		}
-	}
-
+	queryCondition = datahubQueryConditionExtend{r.GetQueryCondition()}.daoQueryCondition()
 	listContainerPredictionsRequest := prediction_dao.ListPodPredictionsRequest{
-		Namespace: namespace,
-		PodName:   podName,
-		StartTime: startTime,
-		EndTime:   endTime,
+		Namespace:      namespace,
+		PodName:        podName,
+		QueryCondition: queryCondition,
 	}
 
 	return listContainerPredictionsRequest
 }
 
 type datahubListNodePredictionsRequestExtended struct {
-	datahub_v1alpha2.ListNodePredictionsRequest
+	*datahub_v1alpha2.ListNodePredictionsRequest
 }
 
 func (r datahubListNodePredictionsRequestExtended) daoListNodePredictionsRequest() prediction_dao.ListNodePredictionsRequest {
 
 	var (
-		nodeNames []string
-		startTime *time.Time
-		endTime   *time.Time
+		nodeNames      []string
+		queryCondition dao.QueryCondition
 	)
-
-	if r.GetQueryCondition() != nil && r.GetQueryCondition().GetTimeRange() != nil {
-
-		if r.GetQueryCondition().GetTimeRange().GetStartTime() != nil {
-			tmpStartTime, _ := ptypes.Timestamp(r.GetQueryCondition().GetTimeRange().GetStartTime())
-			startTime = &tmpStartTime
-		}
-
-		if r.GetQueryCondition().GetTimeRange().GetEndTime() != nil {
-			tmpEndTime, _ := ptypes.Timestamp(r.GetQueryCondition().GetTimeRange().GetEndTime())
-			endTime = &tmpEndTime
-		}
-	}
 
 	for _, nodeName := range r.GetNodeNames() {
 		nodeNames = append(nodeNames, nodeName)
 	}
-
+	queryCondition = datahubQueryConditionExtend{r.GetQueryCondition()}.daoQueryCondition()
 	listNodePredictionsRequest := prediction_dao.ListNodePredictionsRequest{
-		NodeNames: nodeNames,
-		StartTime: startTime,
-		EndTime:   endTime,
+		NodeNames:      nodeNames,
+		QueryCondition: queryCondition,
 	}
 
 	return listNodePredictionsRequest
+}
+
+type datahubListSimulatedSchedulingScoresRequestExtended struct {
+	request *datahub_v1alpha2.ListSimulatedSchedulingScoresRequest
+}
+
+func (r datahubListSimulatedSchedulingScoresRequestExtended) daoLisRequest() score_dao.ListRequest {
+
+	var (
+		queryCondition dao.QueryCondition
+	)
+
+	queryCondition = datahubQueryConditionExtend{r.request.GetQueryCondition()}.daoQueryCondition()
+	listRequest := score_dao.ListRequest{
+		queryCondition,
+	}
+
+	return listRequest
+}
+
+type datahubQueryConditionExtend struct {
+	queryCondition *datahub_v1alpha2.QueryCondition
+}
+
+func (d datahubQueryConditionExtend) metricDAOQueryCondition() dao.QueryCondition {
+
+	var (
+		queryStartTime      *time.Time
+		queryEndTime        *time.Time
+		queryStepTime       *time.Duration
+		queryTimestampOrder int
+		queryLimit          int
+		queryCondition      = dao.QueryCondition{}
+	)
+
+	if d.queryCondition == nil {
+		return queryCondition
+	}
+
+	if d.queryCondition.GetTimeRange() != nil {
+		timeRange := d.queryCondition.GetTimeRange()
+		if timeRange.GetStartTime() != nil {
+			tmpTime, _ := ptypes.Timestamp(timeRange.GetStartTime())
+			queryStartTime = &tmpTime
+		}
+		if timeRange.GetEndTime() != nil {
+			tmpTime, _ := ptypes.Timestamp(timeRange.GetEndTime())
+			queryEndTime = &tmpTime
+		}
+		if timeRange.GetStep() != nil {
+			tmpTime, _ := ptypes.Duration(timeRange.GetStep())
+			queryStepTime = &tmpTime
+		}
+
+		switch d.queryCondition.GetOrder() {
+		case datahub_v1alpha2.QueryCondition_ASC:
+			queryTimestampOrder = dao.Asc
+		case datahub_v1alpha2.QueryCondition_DESC:
+			queryTimestampOrder = dao.Desc
+		default:
+			queryTimestampOrder = dao.Asc
+		}
+
+		queryLimit = int(d.queryCondition.GetLimit())
+	}
+	queryTimestampOrder = int(d.queryCondition.GetOrder())
+	queryLimit = int(d.queryCondition.GetLimit())
+
+	queryCondition = dao.QueryCondition{
+		StartTime:      queryStartTime,
+		EndTime:        queryEndTime,
+		StepTime:       queryStepTime,
+		TimestampOrder: queryTimestampOrder,
+		Limit:          queryLimit,
+	}
+	return queryCondition
+}
+
+func (d datahubQueryConditionExtend) daoQueryCondition() dao.QueryCondition {
+
+	var (
+		queryStartTime      *time.Time
+		queryEndTime        *time.Time
+		queryStepTime       *time.Duration
+		queryTimestampOrder int
+		queryLimit          int
+		queryCondition      = dao.QueryCondition{}
+	)
+
+	if d.queryCondition == nil {
+		return queryCondition
+	}
+
+	if d.queryCondition.GetTimeRange() != nil {
+		timeRange := d.queryCondition.GetTimeRange()
+		if timeRange.GetStartTime() != nil {
+			tmpTime, _ := ptypes.Timestamp(timeRange.GetStartTime())
+			queryStartTime = &tmpTime
+		}
+		if timeRange.GetEndTime() != nil {
+			tmpTime, _ := ptypes.Timestamp(timeRange.GetEndTime())
+			queryEndTime = &tmpTime
+		}
+		if timeRange.GetStep() != nil {
+			tmpTime, _ := ptypes.Duration(timeRange.GetStep())
+			queryStepTime = &tmpTime
+		}
+
+		switch d.queryCondition.GetOrder() {
+		case datahub_v1alpha2.QueryCondition_ASC:
+			queryTimestampOrder = dao.Asc
+		case datahub_v1alpha2.QueryCondition_DESC:
+			queryTimestampOrder = dao.Desc
+		default:
+			queryTimestampOrder = dao.Asc
+		}
+
+		queryLimit = int(d.queryCondition.GetLimit())
+	}
+	queryTimestampOrder = int(d.queryCondition.GetOrder())
+	queryLimit = int(d.queryCondition.GetLimit())
+
+	queryCondition = dao.QueryCondition{
+		StartTime:      queryStartTime,
+		EndTime:        queryEndTime,
+		StepTime:       queryStepTime,
+		TimestampOrder: queryTimestampOrder,
+		Limit:          queryLimit,
+	}
+	return queryCondition
 }

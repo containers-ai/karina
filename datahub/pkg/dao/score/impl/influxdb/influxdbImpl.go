@@ -32,7 +32,7 @@ func (dao influxdbDAO) ListSimulatedScheduingScores(request score_dao.ListReques
 	)
 
 	scoreRepository = influxdb_repository_score.NewRepositoryWithConfig(dao.config)
-	influxdbScoreEntities, err = scoreRepository.ListScoresBetweenTimes(request.StartTime, request.EndTime)
+	influxdbScoreEntities, err = scoreRepository.ListScoresByRequest(request)
 	if err != nil {
 		return scores, errors.New("influxdb score dao CreateSimulatedScheduingScores failed: " + err.Error())
 	}

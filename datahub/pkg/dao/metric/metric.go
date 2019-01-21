@@ -2,8 +2,9 @@ package metric
 
 import (
 	"fmt"
-	"time"
+	"sort"
 
+	"github.com/containers-ai/karina/datahub/pkg/dao"
 	"github.com/containers-ai/karina/datahub/pkg/kubernetes/metadata"
 	"github.com/containers-ai/karina/datahub/pkg/metric"
 )
@@ -18,15 +19,13 @@ type MetricsDAO interface {
 type ListPodMetricsRequest struct {
 	Namespace metadata.NamespaceName
 	PodName   metadata.PodName
-	StartTime time.Time
-	EndTime   time.Time
+	dao.QueryCondition
 }
 
 // ListNodeMetricsRequest Argument of method ListNodeMetrics
 type ListNodeMetricsRequest struct {
 	NodeNames []metadata.NodeName
-	StartTime time.Time
-	EndTime   time.Time
+	dao.QueryCondition
 }
 
 // GetNodeNames Return nodes name in request
@@ -63,6 +62,30 @@ func (c *ContainerMetric) BuildPodMetric() *PodMetric {
 // NamespacePodContainerName Return identity of the container metric.
 func (c ContainerMetric) NamespacePodContainerName() metadata.NamespacePodContainerName {
 	return metadata.NamespacePodContainerName(fmt.Sprintf("%s/%s/%s", c.Namespace, c.PodName, c.ContainerName))
+}
+
+// SortByTimestamp Sort each metric samples by timestamp in input order
+func (c *ContainerMetric) SortByTimestamp(order dao.Order) {
+
+	for _, samples := range c.Metrics {
+		if order == dao.Asc {
+			sort.Sort(metric.SamplesByAscTimestamp(samples))
+		} else {
+			sort.Sort(metric.SamplesByDescTimestamp(samples))
+		}
+	}
+}
+
+// Limit Slicing each metric samples element
+func (c *ContainerMetric) Limit(limit int) {
+
+	if limit == 0 {
+		return
+	}
+
+	for metricType, samples := range c.Metrics {
+		c.Metrics[metricType] = samples[:limit]
+	}
 }
 
 // ContainersMetricMap Containers metric map
@@ -115,6 +138,22 @@ func (p *PodMetric) Merge(in *PodMetric) {
 	p.ContainersMetricMap.Merge(in.ContainersMetricMap)
 }
 
+// SortByTimestamp Sort each container metric's content
+func (p *PodMetric) SortByTimestamp(order dao.Order) {
+
+	for _, containerMetric := range *p.ContainersMetricMap {
+		containerMetric.SortByTimestamp(order)
+	}
+}
+
+// Limit Slicing each container metric content
+func (p *PodMetric) Limit(limit int) {
+
+	for _, containerMetric := range *p.ContainersMetricMap {
+		containerMetric.Limit(limit)
+	}
+}
+
 // PodsMetricMap Pods' metric map
 type PodsMetricMap map[metadata.NamespacePodName]*PodMetric
 
@@ -127,6 +166,22 @@ func (p *PodsMetricMap) AddContainerMetric(c *ContainerMetric) {
 		existedPodMetric.Merge(podMetric)
 	} else {
 		(*p)[namespacePodName] = podMetric
+	}
+}
+
+// SortByTimestamp Sort each pod metric's content
+func (p *PodsMetricMap) SortByTimestamp(order dao.Order) {
+
+	for _, podMetric := range *p {
+		podMetric.SortByTimestamp(order)
+	}
+}
+
+// Limit Slicing each pod metric content
+func (p *PodsMetricMap) Limit(limit int) {
+
+	for _, podMetric := range *p {
+		podMetric.Limit(limit)
 	}
 }
 
@@ -144,6 +199,30 @@ func (n *NodeMetric) Merge(in *NodeMetric) {
 	}
 }
 
+// SortByTimestamp Sort each metric samples by timestamp in input order
+func (n *NodeMetric) SortByTimestamp(order dao.Order) {
+
+	for _, samples := range n.Metrics {
+		if order == dao.Asc {
+			sort.Sort(metric.SamplesByAscTimestamp(samples))
+		} else {
+			sort.Sort(metric.SamplesByDescTimestamp(samples))
+		}
+	}
+}
+
+// Limit Slicing each metric samples element
+func (n *NodeMetric) Limit(limit int) {
+
+	if limit == 0 {
+		return
+	}
+
+	for metricType, samples := range n.Metrics {
+		n.Metrics[metricType] = samples[:limit]
+	}
+}
+
 // NodesMetricMap Nodes' metric map
 type NodesMetricMap map[metadata.NodeName]*NodeMetric
 
@@ -155,5 +234,21 @@ func (n *NodesMetricMap) AddNodeMetric(nodeMetric *NodeMetric) {
 		existNodeMetric.Merge(nodeMetric)
 	} else {
 		(*n)[nodeName] = nodeMetric
+	}
+}
+
+// SortByTimestamp Sort each node metric's content
+func (n *NodesMetricMap) SortByTimestamp(order dao.Order) {
+
+	for _, nodeMetric := range *n {
+		nodeMetric.SortByTimestamp(order)
+	}
+}
+
+// Limit Limit each node metric's content
+func (n *NodesMetricMap) Limit(limit int) {
+
+	for _, nodeMetric := range *n {
+		nodeMetric.Limit(limit)
 	}
 }
