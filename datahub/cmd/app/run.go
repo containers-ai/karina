@@ -14,9 +14,10 @@ import (
 )
 
 var (
-	envVarPrefix = strings.ToUpper(pkg.ProjectCodeName) + "_DATAHUB"
-	scope        *log.Scope
-	config       datahub.Config
+	allowEmptyEnv = true
+	envVarPrefix  = strings.ToUpper(pkg.ProjectCodeName) + "_DATAHUB"
+	scope         *log.Scope
+	config        datahub.Config
 
 	configurationFilePath string
 
@@ -71,6 +72,7 @@ func initViperSetting() {
 	viper.SetEnvPrefix(envVarPrefix)
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_"))
+	viper.AllowEmptyEnv(allowEmptyEnv)
 }
 
 func mergeConfigFileValueWithDefaultConfigValue() {

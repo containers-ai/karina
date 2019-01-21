@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
 	prediction_dao "github.com/containers-ai/karina/datahub/pkg/dao/prediction"
 	node_entity "github.com/containers-ai/karina/datahub/pkg/entity/influxdb/prediction/node"
@@ -91,17 +90,23 @@ func (r *NodeRepository) ListNodePredictionsByRequest(request prediction_dao.Lis
 	)
 
 	whereClause := r.buildInfluxQLWhereClauseFromRequest(request)
-	lastClause, whereTimeClause := r.buildTimeClause(request)
-	if whereTimeClause != "" {
-		if whereClause != "" {
-			whereClause += "and " + whereTimeClause
-		} else {
-			whereClause = "where " + whereTimeClause
-		}
+	influxdbStatement := influxdb.Statement{
+		Measurement: Node,
+		WhereClause: whereClause,
+		GroupByTags: []string{node_entity.Name, node_entity.Metric, node_entity.IsScheduled},
 	}
-	whereClause = strings.TrimSuffix(whereClause, "and ")
 
-	cmd := fmt.Sprintf("SELECT * FROM %s %s %s", string(Node), whereClause, lastClause)
+	queryCondition := influxdb.QueryCondition{
+		StartTime:      request.QueryCondition.StartTime,
+		EndTime:        request.QueryCondition.EndTime,
+		StepTime:       request.QueryCondition.StepTime,
+		TimestampOrder: request.QueryCondition.TimestampOrder,
+		Limit:          request.QueryCondition.Limit,
+	}
+	influxdbStatement.AppendTimeConditionIntoWhereClause(queryCondition)
+	influxdbStatement.SetLimitClauseFromQueryCondition(queryCondition)
+	influxdbStatement.SetOrderClauseFromQueryCondition(queryCondition)
+	cmd := influxdbStatement.BuildQueryCmd()
 
 	results, err = r.influxDB.QueryDB(cmd, string(influxdb.Prediction))
 	if err != nil {
@@ -138,33 +143,4 @@ func (r *NodeRepository) buildInfluxQLWhereClauseFromRequest(request prediction_
 	}
 
 	return whereClause
-}
-
-func (r *NodeRepository) buildTimeClause(request prediction_dao.ListNodePredictionsRequest) (string, string) {
-
-	var (
-		lastClause      string
-		whereTimeClause string
-
-		startTime = time.Now()
-	)
-
-	if request.StartTime == nil && request.EndTime == nil {
-		lastClause = "order by time desc limit 1"
-	} else {
-
-		if request.StartTime != nil {
-			startTime = *request.StartTime
-		}
-
-		nanoTimestampInString := strconv.FormatInt(int64(startTime.UnixNano()), 10)
-		whereTimeClause = fmt.Sprintf("time > %s", nanoTimestampInString)
-
-		if request.EndTime != nil {
-			nanoTimestampInString := strconv.FormatInt(int64(request.EndTime.UnixNano()), 10)
-			whereTimeClause += fmt.Sprintf(" and time <= %s", nanoTimestampInString)
-		}
-	}
-
-	return lastClause, whereTimeClause
 }

@@ -21,7 +21,7 @@ func NewNodeMemoryUsageBytesRepositoryWithConfig(cfg prometheus.Config) NodeMemo
 }
 
 // ListMetricsByPodNamespacedName Provide metrics from response of querying request contain namespace, pod_name and default labels
-func (n NodeMemoryUsageBytesRepository) ListMetricsByNodeName(nodeName string, startTime, endTime time.Time) ([]prometheus.Entity, error) {
+func (n NodeMemoryUsageBytesRepository) ListMetricsByNodeName(nodeName string, startTime, endTime *time.Time, stepTime *time.Duration) ([]prometheus.Entity, error) {
 
 	var (
 		err error
@@ -55,7 +55,7 @@ func (n NodeMemoryUsageBytesRepository) ListMetricsByNodeName(nodeName string, s
 		queryExpression = fmt.Sprintf("%s - %s", nodeMemoryBytesTotalMetricName, nodeMemoryAvailableBytesMetricName)
 	}
 
-	response, err = prometheusClient.QueryRange(queryExpression, startTime, endTime)
+	response, err = prometheusClient.QueryRange(queryExpression, startTime, endTime, stepTime)
 	if err != nil {
 		return entities, errors.New("ListMetricsByNodeName failed: " + err.Error())
 	} else if response.Status != prometheus.StatusSuccess {

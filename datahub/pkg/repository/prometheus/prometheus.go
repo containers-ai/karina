@@ -25,14 +25,14 @@ const (
 	StatusSuccess = "success"
 	// StatusError Status string literal of prometheus api request
 	StatusError = "error"
-
-	defaultStepTimeString = "30"
 )
 
 var (
-	scope = log.RegisterScope("prometheus", "metrics repository", 0)
+	scope              = log.RegisterScope("prometheus", "metrics repository", 0)
+	defaultStepTime, _ = time.ParseDuration("30s")
 )
 
+// Entity Structure to store metrics data from Prometheus response
 type Entity struct {
 	Labels map[string]string
 	Values []UnixTimeWithSampleValue
@@ -86,10 +86,14 @@ func New(config Config) (*Prometheus, error) {
 }
 
 // QueryRange Query data over a range of time from prometheus
-func (p *Prometheus) QueryRange(query string, startTime, endTime time.Time) (Response, error) {
+func (p *Prometheus) QueryRange(query string, startTime, endTime *time.Time, stepTime *time.Duration) (Response, error) {
 
 	var (
 		err error
+
+		startTimeString string
+		endTimeString   string
+		stepTimeString  string
 
 		endpoint        = apiPrefix + epQueryRange
 		queryParameters = url.Values{}
@@ -101,13 +105,27 @@ func (p *Prometheus) QueryRange(query string, startTime, endTime time.Time) (Res
 		response Response
 	)
 
-	startTimeString := strconv.FormatInt(int64(startTime.Unix()), 10)
-	endTimeString := strconv.FormatInt(int64(endTime.Unix()), 10)
+	if startTime == nil {
+		tmpTime := time.Unix(0, 0)
+		startTime = &tmpTime
+	}
+	startTimeString = strconv.FormatInt(int64(startTime.Unix()), 10)
+
+	if endTime == nil {
+		tmpTime := time.Now()
+		endTime = &tmpTime
+	}
+	endTimeString = strconv.FormatInt(int64(endTime.Unix()), 10)
+
+	if stepTime == nil {
+		stepTime = &defaultStepTime
+	}
+	stepTimeString = strconv.FormatInt(int64(stepTime.Nanoseconds()/int64(time.Second)), 10)
 
 	queryParameters.Set("query", query)
 	queryParameters.Set("start", startTimeString)
 	queryParameters.Set("end", endTimeString)
-	queryParameters.Set("step", defaultStepTimeString)
+	queryParameters.Set("step", stepTimeString)
 
 	u, err = url.Parse(p.config.URL + endpoint)
 	if err != nil {
@@ -140,6 +158,7 @@ func (p *Prometheus) QueryRange(query string, startTime, endTime time.Time) (Res
 	return response, nil
 }
 
+// Close Free resoure used by Prometehus
 func (p *Prometheus) Close() {
 	p.transport.CloseIdleConnections()
 }

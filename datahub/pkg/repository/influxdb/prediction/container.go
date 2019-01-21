@@ -3,9 +3,6 @@ package prediction
 import (
 	"errors"
 	"fmt"
-	"strconv"
-	"strings"
-	"time"
 
 	prediction_dao "github.com/containers-ai/karina/datahub/pkg/dao/prediction"
 	container_entity "github.com/containers-ai/karina/datahub/pkg/entity/influxdb/prediction/container"
@@ -94,22 +91,27 @@ func (r *ContainerRepository) ListContainerPredictionsByRequest(request predicti
 	)
 
 	whereClause := r.buildInfluxQLWhereClauseFromRequest(request)
-	lastClause, whereTimeClause := r.buildTimeClause(request)
-	if whereTimeClause != "" {
-		if whereClause != "" {
-			whereClause += whereTimeClause
-		} else {
-			whereClause = "where " + whereTimeClause
-		}
+	influxdbStatement := influxdb.Statement{
+		Measurement: Container,
+		WhereClause: whereClause,
+		GroupByTags: []string{container_entity.Namespace, container_entity.PodName, container_entity.Name, container_entity.Metric},
 	}
-	whereClause = strings.TrimSuffix(whereClause, "and ")
 
-	cmd := fmt.Sprintf("SELECT * FROM %s %s %s", Container, whereClause, lastClause)
+	queryCondition := influxdb.QueryCondition{
+		StartTime:      request.QueryCondition.StartTime,
+		EndTime:        request.QueryCondition.EndTime,
+		StepTime:       request.QueryCondition.StepTime,
+		TimestampOrder: request.QueryCondition.TimestampOrder,
+		Limit:          request.QueryCondition.Limit,
+	}
+	influxdbStatement.AppendTimeConditionIntoWhereClause(queryCondition)
+	influxdbStatement.SetLimitClauseFromQueryCondition(queryCondition)
+	influxdbStatement.SetOrderClauseFromQueryCondition(queryCondition)
+	cmd := influxdbStatement.BuildQueryCmd()
 
 	results, err = r.influxDB.QueryDB(cmd, string(influxdb.Prediction))
 	if err != nil {
 		return entities, err
-
 	}
 
 	rows = influxdb.PackMap(results)
@@ -134,7 +136,7 @@ func (r *ContainerRepository) buildInfluxQLWhereClauseFromRequest(request predic
 		conditions += fmt.Sprintf(`"%s" = '%s' and `, container_entity.Namespace, request.Namespace)
 	}
 	if request.PodName != "" {
-		conditions += fmt.Sprintf(`"%s" = '%s' and `, container_entity.PodName, request.PodName)
+		conditions += fmt.Sprintf(`"%s" = '%s'`, container_entity.PodName, request.PodName)
 	}
 
 	if conditions != "" {
@@ -142,33 +144,4 @@ func (r *ContainerRepository) buildInfluxQLWhereClauseFromRequest(request predic
 	}
 
 	return whereClause
-}
-
-func (r *ContainerRepository) buildTimeClause(request prediction_dao.ListPodPredictionsRequest) (string, string) {
-
-	var (
-		lastClause      string
-		whereTimeClause string
-
-		startTime = time.Now()
-	)
-
-	if request.StartTime == nil && request.EndTime == nil {
-		lastClause = "order by time desc limit 1"
-	} else {
-
-		if request.StartTime != nil {
-			startTime = *request.StartTime
-		}
-
-		nanoTimestampInString := strconv.FormatInt(int64(startTime.UnixNano()), 10)
-		whereTimeClause = fmt.Sprintf("time > %s and ", nanoTimestampInString)
-
-		if request.EndTime != nil {
-			nanoTimestampInString := strconv.FormatInt(int64(request.EndTime.UnixNano()), 10)
-			whereTimeClause += fmt.Sprintf("time <= %s and ", nanoTimestampInString)
-		}
-	}
-
-	return lastClause, whereTimeClause
 }

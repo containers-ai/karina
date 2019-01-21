@@ -2,8 +2,8 @@ package prediction
 
 import (
 	"fmt"
-	"time"
 
+	"github.com/containers-ai/karina/datahub/pkg/dao"
 	"github.com/containers-ai/karina/datahub/pkg/kubernetes/metadata"
 	"github.com/containers-ai/karina/datahub/pkg/metric"
 )
@@ -23,15 +23,13 @@ type DAO interface {
 type ListPodPredictionsRequest struct {
 	Namespace string
 	PodName   string
-	StartTime *time.Time
-	EndTime   *time.Time
+	dao.QueryCondition
 }
 
 // ListNodePredictionsRequest ListNodePredictionsRequest
 type ListNodePredictionsRequest struct {
 	NodeNames []string
-	StartTime *time.Time
-	EndTime   *time.Time
+	dao.QueryCondition
 }
 
 // ContainerPrediction Prediction model to represent one container Prediction

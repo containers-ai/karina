@@ -30,6 +30,7 @@ func (p daoPodMetricExtended) datahubPodMetric() *datahub_metric_v1alpha2.PodMet
 			Namespace: string(p.Namespace),
 			Name:      string(p.PodName),
 		},
+		ContainerMetrics: make([]*datahub_metric_v1alpha2.ContainerMetric, 0),
 	}
 
 	for _, containerMetric := range *p.ContainersMetricMap {
@@ -55,7 +56,8 @@ func (c daoContainerMetricExtended) datahubContainerMetric() *datahub_metric_v1a
 	)
 
 	datahubContainerMetric = datahub_metric_v1alpha2.ContainerMetric{
-		Name: string(c.ContainerName),
+		Name:       string(c.ContainerName),
+		MetricData: make(map[int32]*datahub_metric_v1alpha2.MetricData),
 	}
 
 	for metricType, samples := range c.Metrics {
@@ -87,7 +89,8 @@ func (n daoNodeMetricExtended) datahubNodeMetric() *datahub_metric_v1alpha2.Node
 	)
 
 	datahubNodeMetric = datahub_metric_v1alpha2.NodeMetric{
-		Name: n.NodeName,
+		Name:       n.NodeName,
+		MetricData: make(map[int32]*datahub_metric_v1alpha2.MetricData),
 	}
 
 	for metricType, samples := range n.Metrics {
@@ -145,7 +148,8 @@ func (c daoContainerPredictionExtended) datahubContainerPrediction() *datahub_pr
 	)
 
 	datahubContainerPrediction = datahub_prediction_v1alpha2.ContainerPrediction{
-		Name: string(c.ContainerName),
+		Name:             string(c.ContainerName),
+		PredictedRawData: make(map[int32]*datahub_metric_v1alpha2.MetricData),
 	}
 
 	for metricType, samples := range c.Predictions {
@@ -177,8 +181,9 @@ func (d daoPtrNodePredictionExtended) datahubNodePrediction() *datahub_predictio
 	)
 
 	datahubNodePrediction = datahub_prediction_v1alpha2.NodePrediction{
-		Name:        string(d.NodeName),
-		IsScheduled: d.IsScheduled,
+		Name:             string(d.NodeName),
+		IsScheduled:      d.IsScheduled,
+		PredictedRawData: make(map[int32]*datahub_metric_v1alpha2.MetricData),
 	}
 
 	for metricType, samples := range d.Predictions {
