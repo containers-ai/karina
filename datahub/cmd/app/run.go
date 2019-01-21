@@ -55,7 +55,7 @@ func init() {
 }
 
 func parseFlag() {
-	RunCmd.Flags().StringVar(&configurationFilePath, "config", "/etc/karina/datahub/datahub.yml", "The path to datahub configuration file.")
+	RunCmd.Flags().StringVar(&configurationFilePath, "config", "/etc/federatorai/datahub/datahub.yml", "The path to datahub configuration file.")
 }
 
 func initConfig() {
