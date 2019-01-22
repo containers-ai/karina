@@ -1,0 +1,15 @@
+pull_request_rules:
+  - name: automatic merge
+    conditions:
+      - label!=DNM
+      - '#approved-reviews-by>=2'
+      - 'status-success=ci/circleci: build'
+      - 'status-success=DCO'
+      - 'status-success=WIP'
+    actions:
+      merge:
+        method: rebase
+        rebase_fallback: merge
+        strict: smart
+      dismiss_reviews: {}
+      delete_head_branch: {}
