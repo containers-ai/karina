@@ -15,6 +15,7 @@ import (
 	"github.com/containers-ai/karina/pkg/utils/log"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	influxdb_client "github.com/influxdata/influxdb/client/v2"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -163,9 +164,13 @@ func (containerRepository *ContainerRepository) CreateContainerRecommendations(p
 			}
 		}
 	}
-	containerRepository.influxDB.WritePoints(points, influxdb_client.BatchPointsConfig{
+	err := containerRepository.influxDB.WritePoints(points, influxdb_client.BatchPointsConfig{
 		Database: string(influxdb.Recommendation),
 	})
+	if err != nil {
+		return errors.Wrapf(err, "create container recommendations failed: %s", err.Error())
+	}
+
 	return nil
 }
 
@@ -351,7 +356,7 @@ func (containerRepository *ContainerRepository) ListContainerRecommendations(pod
 		}
 		return podRecommendations, nil
 	} else {
-		return podRecommendations, err
+		return podRecommendations, errors.Wrapf(err, "list container recommendations failed: %s", err.Error())
 	}
 }
 

@@ -2,7 +2,6 @@ package clusterstatus
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 
@@ -15,6 +14,7 @@ import (
 	"github.com/containers-ai/karina/pkg/utils/log"
 	proto_timestmap "github.com/golang/protobuf/ptypes/timestamp"
 	influxdb_client "github.com/influxdata/influxdb/client/v2"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -111,7 +111,7 @@ func (containerRepository *ContainerRepository) ListPredictedContainers(scalerNS
 		}
 		return podList, nil
 	} else {
-		return podList, err
+		return podList, errors.Wrapf(err, "list predicted containers failed: %s", err.Error())
 	}
 }
 
@@ -179,9 +179,13 @@ func (containerRepository *ContainerRepository) CreateContainers(pods []*datahub
 			}
 		}
 	}
-	containerRepository.influxDB.WritePoints(points, influxdb_client.BatchPointsConfig{
+	err := containerRepository.influxDB.WritePoints(points, influxdb_client.BatchPointsConfig{
 		Database: string(influxdb.ClusterStatus),
 	})
+	if err != nil {
+		return errors.Wrapf(err, "create container failed: %s", err.Error())
+	}
+
 	return nil
 }
 
@@ -189,25 +193,27 @@ func (containerRepository *ContainerRepository) CreateContainers(pods []*datahub
 func (containerRepository *ContainerRepository) UpdateContainers(containerEntities []*cluster_status_entity.ContainerEntity) error {
 
 	var (
-		err            error
+		errorFmt = "update containers failed: %s"
+
 		pointsToUpdate = make([]*influxdb_client.Point, 0)
 	)
 
-	if err != nil {
-		return errors.New("update containers failed: " + err.Error())
-	}
 	for _, containerEntity := range containerEntities {
 		point, err := (*containerEntity).InfluxDBPoint(string(Container))
 		if err != nil {
-			return errors.New("update containers failed: " + err.Error())
+			return errors.Wrapf(err, errorFmt, err.Error())
 		}
 
 		pointsToUpdate = append(pointsToUpdate, point)
 	}
 
-	containerRepository.influxDB.WritePoints(pointsToUpdate, influxdb_client.BatchPointsConfig{
+	err := containerRepository.influxDB.WritePoints(pointsToUpdate, influxdb_client.BatchPointsConfig{
 		Database: string(influxdb.ClusterStatus),
 	})
+	if err != nil {
+		return errors.Wrapf(err, errorFmt, err.Error())
+	}
+
 	return nil
 }
 
@@ -215,7 +221,8 @@ func (containerRepository *ContainerRepository) UpdateContainers(containerEntiti
 func (containerRepository *ContainerRepository) DeleteContainers(pods []*datahub_resource_v1alpha2.Pod) error {
 
 	var (
-		err error
+		err      error
+		errorFmt = "delete containers failed: %s"
 
 		containersEntityBeforeDelete = make([]*cluster_status_entity.ContainerEntity, 0)
 
@@ -224,7 +231,7 @@ func (containerRepository *ContainerRepository) DeleteContainers(pods []*datahub
 
 	containersEntityBeforeDelete, err = containerRepository.ListPodsContainers(pods)
 	if err != nil {
-		return errors.New("delete containers failed: " + err.Error())
+		return errors.Wrapf(err, errorFmt, err.Error())
 	}
 	for _, containerEntity := range containersEntityBeforeDelete {
 		entity := *containerEntity
@@ -233,15 +240,19 @@ func (containerRepository *ContainerRepository) DeleteContainers(pods []*datahub
 		entity.IsDeleted = &trueValue
 		point, err := entity.InfluxDBPoint(string(Container))
 		if err != nil {
-			return errors.New("delete containers failed: " + err.Error())
+			return errors.Wrapf(err, errorFmt, err.Error())
 		}
 
 		pointsToDelete = append(pointsToDelete, point)
 	}
 
-	containerRepository.influxDB.WritePoints(pointsToDelete, influxdb_client.BatchPointsConfig{
+	err = containerRepository.influxDB.WritePoints(pointsToDelete, influxdb_client.BatchPointsConfig{
 		Database: string(influxdb.ClusterStatus),
 	})
+	if err != nil {
+		return errors.Wrapf(err, errorFmt, err.Error())
+	}
+
 	return nil
 }
 
@@ -249,6 +260,8 @@ func (containerRepository *ContainerRepository) DeleteContainers(pods []*datahub
 func (containerRepository *ContainerRepository) ListPodsContainers(pods []*datahub_resource_v1alpha2.Pod) ([]*cluster_status_entity.ContainerEntity, error) {
 
 	var (
+		errorFmt = "list containers in pods failed: %s"
+
 		cmd                 = ""
 		cmdSelectString     = ""
 		cmdTagsFilterString = ""
@@ -283,7 +296,7 @@ func (containerRepository *ContainerRepository) ListPodsContainers(pods []*datah
 	containerScope.Debug("List pod containers CMD: " + cmd)
 	results, err := containerRepository.influxDB.QueryDB(cmd, string(influxdb.ClusterStatus))
 	if err != nil {
-		return containerEntities, errors.New("list containers' entity failed: " + err.Error())
+		return containerEntities, errors.Wrapf(err, errorFmt, err.Error())
 	}
 
 	rows := influxdb.PackMap(results)

@@ -1,14 +1,13 @@
 package impl
 
 import (
-	"errors"
-
 	datahub_resource_v1alpha2 "github.com/containers-ai/api/datahub/resource/v1alpha2"
 	datahub_v1alpha2 "github.com/containers-ai/api/datahub/v1alpha2"
 	cluster_status_entity "github.com/containers-ai/karina/datahub/pkg/entity/influxdb/cluster_status"
 	influxdb_repository "github.com/containers-ai/karina/datahub/pkg/repository/influxdb"
 	influxdb_repository_cluster_status "github.com/containers-ai/karina/datahub/pkg/repository/influxdb/cluster_status"
 	"github.com/containers-ai/karina/pkg/utils/log"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -31,7 +30,7 @@ func (container *Container) DeletePods(pods []*datahub_resource_v1alpha2.Pod) er
 	pointsToDelete := []*cluster_status_entity.ContainerEntity{}
 	containerRepository := influxdb_repository_cluster_status.NewContainerRepository(&container.InfluxDBConfig)
 	if containersEntity, err := containerRepository.ListPodsContainers(pods); err != nil {
-		return errors.New("delete pods failed: " + err.Error())
+		return errors.Wrapf(err, "delete pods failed: %s", err.Error())
 	} else {
 		for _, containerEntity := range containersEntity {
 			entity := *containerEntity
@@ -58,7 +57,7 @@ func (container *Container) UpdatePods(updatedPods []*datahub_v1alpha2.UpdatePod
 	pointsToUpdate := []*cluster_status_entity.ContainerEntity{}
 	containerRepository := influxdb_repository_cluster_status.NewContainerRepository(&container.InfluxDBConfig)
 	if containersEntity, err := containerRepository.ListPodsContainers(pods); err != nil {
-		return errors.New("delete pods failed: " + err.Error())
+		return errors.Wrapf(err, "delete pods failed: %s", err.Error())
 	} else {
 		for _, containerEntity := range containersEntity {
 			for _, updatePod := range updatedPods {

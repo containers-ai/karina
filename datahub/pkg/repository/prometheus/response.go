@@ -2,9 +2,10 @@ package prometheus
 
 import (
 	"encoding/json"
-	"fmt"
 	"reflect"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 const (
@@ -101,59 +102,7 @@ type VectorData struct {
 	}
 }
 
-func (r Response) GetMatrixResponse() (MatrixResponse, error) {
-
-	var (
-		response = MatrixResponse{}
-	)
-
-	for _, r := range r.Data.Result {
-
-		matrixResult := MatrixResult{}
-		if _, ok := r.(map[string]interface{}); !ok {
-			return response, fmt.Errorf("error while building sample, cannot convert type %s to map[string]interface{}", reflect.TypeOf(r).String())
-		}
-		resultStr, err := json.Marshal(r.(map[string]interface{}))
-		if err != nil {
-			return response, err
-		}
-		err = json.Unmarshal(resultStr, &matrixResult)
-		if err != nil {
-			return response, err
-		}
-
-		var typeSpecifiedMatrixResult = struct {
-			Metric map[string]string
-			Values []UnixTimeWithSampleValue
-		}{
-			Metric: matrixResult.Metric,
-		}
-
-		for _, value := range matrixResult.Values {
-
-			if _, ok := value[0].(float64); !ok {
-				return response, fmt.Errorf("error while building sample, cannot convert type %s to float64", reflect.TypeOf(value[0]))
-			}
-			unixTime := time.Unix(int64(value[0].(float64)), 0)
-
-			if _, ok := value[1].(string); !ok {
-				return response, fmt.Errorf("error while building sample, cannot convert type %s to string", reflect.TypeOf(value[1]))
-			}
-			sampleValue := value[1].(string)
-
-			unixTimeWithSampleValue := UnixTimeWithSampleValue{
-				UnixTime:    unixTime,
-				SampleValue: sampleValue,
-			}
-			typeSpecifiedMatrixResult.Values = append(typeSpecifiedMatrixResult.Values, unixTimeWithSampleValue)
-		}
-
-		response.Data.Result = append(response.Data.Result, typeSpecifiedMatrixResult)
-	}
-
-	return response, nil
-}
-
+// GetEntitis return prometheus entities
 func (r Response) GetEntitis() ([]Entity, error) {
 
 	var (
@@ -161,7 +110,7 @@ func (r Response) GetEntitis() ([]Entity, error) {
 	)
 
 	if r.Status != StatusSuccess {
-		return entities, fmt.Errorf("GetEntitis failed: response status is not %s", StatusSuccess)
+		return entities, errors.Errorf("response status is not %s", StatusSuccess)
 	}
 
 	switch r.Data.ResultType {
@@ -170,15 +119,15 @@ func (r Response) GetEntitis() ([]Entity, error) {
 
 			matrixResult := MatrixResult{}
 			if _, ok := r.(map[string]interface{}); !ok {
-				return entities, fmt.Errorf("error while building sample, cannot convert type %s to map[string]interface{}", reflect.TypeOf(r).String())
+				return entities, errors.Errorf("error while building sample, cannot convert type %s to map[string]interface{}", reflect.TypeOf(r).String())
 			}
 			resultStr, err := json.Marshal(r.(map[string]interface{}))
 			if err != nil {
-				return entities, err
+				return entities, errors.New(err.Error())
 			}
 			err = json.Unmarshal(resultStr, &matrixResult)
 			if err != nil {
-				return entities, err
+				return entities, errors.New(err.Error())
 			}
 
 			entity := Entity{
@@ -188,12 +137,12 @@ func (r Response) GetEntitis() ([]Entity, error) {
 			for _, value := range matrixResult.Values {
 
 				if _, ok := value[0].(float64); !ok {
-					return entities, fmt.Errorf("error while building sample, cannot convert type %s to float64", reflect.TypeOf(value[0]))
+					return entities, errors.Errorf("error while building sample, cannot convert type %s to float64", reflect.TypeOf(value[0]))
 				}
 				unixTime := time.Unix(int64(value[0].(float64)), 0)
 
 				if _, ok := value[1].(string); !ok {
-					return entities, fmt.Errorf("error while building sample, cannot convert type %s to string", reflect.TypeOf(value[1]))
+					return entities, errors.Errorf("error while building sample, cannot convert type %s to string", reflect.TypeOf(value[1]))
 				}
 				sampleValue := value[1].(string)
 
@@ -207,7 +156,7 @@ func (r Response) GetEntitis() ([]Entity, error) {
 			entities = append(entities, entity)
 		}
 	default:
-		return entities, fmt.Errorf("GetEntitis failed: result type not supported %s", string(r.Data.ResultType))
+		return entities, errors.Errorf("result type not supported %s", string(r.Data.ResultType))
 	}
 
 	return entities, nil

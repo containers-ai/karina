@@ -6,6 +6,7 @@ import (
 
 	"github.com/containers-ai/karina/datahub/pkg/utils"
 	influxdb_client "github.com/influxdata/influxdb/client/v2"
+	"github.com/pkg/errors"
 )
 
 type nodeField = string
@@ -89,5 +90,10 @@ func (e NodeEntity) InfluxDBPoint(measurementName string) (*influxdb_client.Poin
 		fields[NodeInCluster] = *e.InCluster
 	}
 
-	return influxdb_client.NewPoint(measurementName, tags, fields, e.Time)
+	point, err := influxdb_client.NewPoint(measurementName, tags, fields, e.Time)
+	if err != nil {
+		return nil, errors.Wrapf(err, "new influxdb point from node entity failed: %s", err.Error())
+	}
+
+	return point, nil
 }

@@ -1,7 +1,6 @@
 package datahub
 
 import (
-	"errors"
 	"fmt"
 	"net"
 
@@ -26,6 +25,7 @@ import (
 	recommendation_reconciler "github.com/containers-ai/karina/operator/pkg/reconciler/recommendation"
 	"github.com/containers-ai/karina/pkg/utils/log"
 	"github.com/golang/protobuf/ptypes"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/genproto/googleapis/rpc/status"
@@ -187,11 +187,12 @@ func (s *Server) ListPodMetrics(ctx context.Context, in *datahub_v1alpha2.ListPo
 
 	podsMetricMap, err = metricDAO.ListPodMetrics(listPodMetricsRequest)
 	if err != nil {
-		scope.Error("ListPodMetrics failed: " + err.Error())
+		scope.Errorf("ListPodMetrics failed: %+v", errors.Cause(err))
 		errMsg := "Internal server error"
 		switch err.(type) {
 		case metric_dao.ErrorQueryConditionExceedMaximum:
 			errMsg = errorQueryConditionExceedMaximum
+		default:
 		}
 		return &datahub_v1alpha2.ListPodMetricsResponse{
 			Status: &status.Status{
@@ -229,13 +230,6 @@ func (s *Server) ListNodeMetrics(ctx context.Context, in *datahub_v1alpha2.ListN
 
 		nodesMetricMap     metric_dao.NodesMetricMap
 		datahubNodeMetrics []*datahub_metric_v1alpha2.NodeMetric
-
-		apiInternalServerErrorResponse = datahub_v1alpha2.ListNodeMetricsResponse{
-			Status: &status.Status{
-				Code:    int32(code.Code_INTERNAL),
-				Message: "Internal server error.",
-			},
-		}
 	)
 
 	requestExt = datahubListNodeMetricsRequestExtended{*in}
@@ -259,7 +253,7 @@ func (s *Server) ListNodeMetrics(ctx context.Context, in *datahub_v1alpha2.ListN
 
 	nodesMetricMap, err = metricDAO.ListNodesMetric(listNodeMetricsRequest)
 	if err != nil {
-		scope.Error("ListNodeMetrics failed: " + err.Error())
+		scope.Errorf("ListNodeMetrics failed: %+v", errors.Cause(err))
 		errMsg := "Internal server error"
 		switch err.(type) {
 		case metric_dao.ErrorQueryConditionExceedMaximum:
@@ -271,7 +265,6 @@ func (s *Server) ListNodeMetrics(ctx context.Context, in *datahub_v1alpha2.ListN
 				Message: errMsg,
 			},
 		}, nil
-		return &apiInternalServerErrorResponse, nil
 	}
 
 	for _, nodeMetric := range nodesMetricMap {
@@ -300,7 +293,7 @@ func (s *Server) ListPods(ctx context.Context, in *datahub_v1alpha2.ListPodsRequ
 	}
 
 	if pods, err := containerDAO.ListPredictedPods(scalerNS, scalerName, in.GetIsPredicted()); err != nil {
-		scope.Error(err.Error())
+		scope.Errorf("ListPod failed: %+v", err.Error())
 		return &datahub_v1alpha2.ListPodsResponse{
 			Status: &status.Status{
 				Code:    int32(code.Code_INTERNAL),
@@ -324,7 +317,7 @@ func (s *Server) ListNodes(ctx context.Context, in *datahub_v1alpha2.ListNodesRe
 	}
 
 	if predictedNodes, err := nodeDAO.ListNodes(in.GetIsPredicted()); err != nil {
-		scope.Error(err.Error())
+		scope.Errorf("ListNodes failed: %+v", errors.Cause(err))
 		return &datahub_v1alpha2.ListNodesResponse{
 			Status: &status.Status{
 				Code:    int32(code.Code_INTERNAL),
@@ -366,7 +359,7 @@ func (s *Server) ListPodPredictions(ctx context.Context, in *datahub_v1alpha2.Li
 	listPodPredictionsRequest := datahubListPodPredictionsRequestExtended.daoListPodPredictionsRequest()
 	podsPredicitonMap, err = predictionDAO.ListPodPredictions(listPodPredictionsRequest)
 	if err != nil {
-		scope.Error("ListPodPrediction failed: " + err.Error())
+		scope.Errorf("ListPodPrediction failed: %+v", errors.Cause(err))
 		return &apiResponseInternalServerError, nil
 	}
 
@@ -409,7 +402,7 @@ func (s *Server) ListNodePredictions(ctx context.Context, in *datahub_v1alpha2.L
 	listNodePredictionRequest := datahubListNodePredictionsRequestExtended.daoListNodePredictionsRequest()
 	nodesPredicitonMap, err = predictionDAO.ListNodePredictions(listNodePredictionRequest)
 	if err != nil {
-		scope.Error("ListNodePredictions failed: " + err.Error())
+		scope.Errorf("ListNodePredictions failed: %+v", errors.Cause(err))
 		return &apiResponseInternalServerError, nil
 	}
 
@@ -430,7 +423,7 @@ func (s *Server) ListPodRecommendations(ctx context.Context, in *datahub_v1alpha
 	}
 
 	if podRecommendations, err := containerDAO.ListPodRecommendations(in.GetNamespacedName(), in.GetQueryCondition()); err != nil {
-		scope.Error(err.Error())
+		scope.Errorf("ListPodRecommendations failed: %+v", errors.Cause(err))
 		return &datahub_v1alpha2.ListPodRecommendationsResponse{
 			Status: &status.Status{
 				Code:    int32(code.Code_INTERNAL),
@@ -467,7 +460,7 @@ func (s *Server) ListSimulatedSchedulingScores(ctx context.Context, in *datahub_
 
 	scoreDAOSimulatedSchedulingScores, err = scoreDAO.ListSimulatedScheduingScores(scoreDAOListRequest)
 	if err != nil {
-		scope.Errorf("api ListSimulatedSchedulingScores failed: %s", err.Error())
+		scope.Errorf("ListSimulatedSchedulingScores failed: %+v", errors.Cause(err))
 		return &datahub_v1alpha2.ListSimulatedSchedulingScoresResponse{
 			Status: &status.Status{
 				Code:    int32(code.Code_INTERNAL),
@@ -506,7 +499,7 @@ func (s *Server) UpdateNodes(ctx context.Context, in *datahub_v1alpha2.UpdateNod
 	}
 
 	if err := nodeDAO.UpdateNodes(in.GetUpdatedNodes()); err != nil {
-		scope.Error(err.Error())
+		scope.Errorf("UpdateNodes failed: %+v", errors.Cause(err))
 		return &status.Status{
 			Code:    int32(code.Code_INTERNAL),
 			Message: "Internal server error.",
@@ -523,7 +516,7 @@ func (s *Server) UpdatePods(ctx context.Context, in *datahub_v1alpha2.UpdatePods
 		InfluxDBConfig: *s.Config.InfluxDB,
 	}
 	if err := containerDAO.UpdatePods(in.GetUpdatedPods()); err != nil {
-		scope.Error(err.Error())
+		scope.Errorf("UpdatePods failed: %+v", errors.Cause(err))
 		return &status.Status{
 			Code:    int32(code.Code_INTERNAL),
 			Message: "Internal server error.",
@@ -541,7 +534,7 @@ func (s *Server) CreatePods(ctx context.Context, in *datahub_v1alpha2.CreatePods
 	}
 
 	if err := containerDAO.AddPods(in.GetPods()); err != nil {
-		scope.Error(err.Error())
+		scope.Errorf("CreatePods failed: %+v", errors.Cause(err))
 		return &status.Status{
 			Code:    int32(code.Code_INTERNAL),
 			Message: err.Error(),
@@ -558,7 +551,7 @@ func (s *Server) CreateNodes(ctx context.Context, in *datahub_v1alpha2.CreateNod
 		InfluxDBConfig: *s.Config.InfluxDB,
 	}
 	if err := nodeDAO.AddNodes(in.GetNodes()); err != nil {
-		scope.Error(err.Error())
+		scope.Errorf("CreateNodes failed: %+v", errors.Cause(err))
 		return &status.Status{
 			Code:    int32(code.Code_INTERNAL),
 			Message: err.Error(),
@@ -590,7 +583,7 @@ func (s *Server) CreatePodPredictions(ctx context.Context, in *datahub_v1alpha2.
 	containersPrediciton = datahubCreatePodPredictionsRequestExtended{*in}.daoContainerPredictions()
 	err = predictionDAO.CreateContainerPredictions(containersPrediciton)
 	if err != nil {
-		scope.Errorf("create pod predictions failed: " + err.Error())
+		scope.Errorf("CreatePodPredictions failed: %+v", errors.Cause(err))
 		return &apiResponseInternalServerError, nil
 	}
 
@@ -655,7 +648,7 @@ func (s *Server) CreatePodRecommendations(ctx context.Context, in *datahub_v1alp
 	}
 
 	if err := containerDAO.AddPodRecommendations(podRecommendations); err != nil {
-		scope.Error(err.Error())
+		scope.Errorf("CreatePodRecommendations failed: %+v", errors.Cause(err))
 		return &status.Status{
 			Code:    int32(code.Code_INTERNAL),
 			Message: err.Error(),
@@ -696,7 +689,7 @@ func (s *Server) CreateSimulatedSchedulingScores(ctx context.Context, in *datahu
 
 	err = scoreDAO.CreateSimulatedScheduingScores(daoSimulatedSchedulingScoreEntites)
 	if err != nil {
-		scope.Errorf("api CreateSimulatedSchedulingScores failed: %s", err.Error())
+		scope.Errorf("CreateSimulatedSchedulingScores failed: %+v", errors.Cause(err))
 		return &status.Status{
 			Code:    int32(code.Code_INTERNAL),
 			Message: "Internal server error.",
@@ -720,7 +713,7 @@ func (s *Server) DeleteNodes(ctx context.Context, in *datahub_v1alpha2.DeleteNod
 		})
 	}
 	if err := nodeDAO.DeleteNodes(nodeList); err != nil {
-		scope.Error(err.Error())
+		scope.Errorf("DeleteNodes failed: %+v", errors.Cause(err))
 		return &status.Status{
 			Code:    int32(code.Code_INTERNAL),
 			Message: err.Error(),
@@ -738,7 +731,7 @@ func (s *Server) DeletePods(ctx context.Context, in *datahub_v1alpha2.DeletePods
 		InfluxDBConfig: *s.Config.InfluxDB,
 	}
 	if err := containerDAO.DeletePods(in.GetPods()); err != nil {
-		scope.Error(err.Error())
+		scope.Errorf("DeletePods failed: %+v", errors.Cause(err))
 		return &status.Status{
 			Code:    int32(code.Code_INTERNAL),
 			Message: "Internal server error.",

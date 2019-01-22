@@ -1,15 +1,14 @@
 package clusterstatus
 
 import (
-	"errors"
 	"fmt"
 
 	datahub_resource_v1alpha2 "github.com/containers-ai/api/datahub/resource/v1alpha2"
-
 	cluster_status_entity "github.com/containers-ai/karina/datahub/pkg/entity/influxdb/cluster_status"
 	"github.com/containers-ai/karina/datahub/pkg/repository/influxdb"
 	"github.com/containers-ai/karina/pkg/utils/log"
 	influxdb_client "github.com/influxdata/influxdb/client/v2"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -58,22 +57,35 @@ func (nodeRepository *NodeRepository) AddNodes(nodes []*datahub_resource_v1alpha
 			scope.Error(err.Error())
 		}
 	}
-	nodeRepository.influxDB.WritePoints(points, influxdb_client.BatchPointsConfig{
+	err := nodeRepository.influxDB.WritePoints(points, influxdb_client.BatchPointsConfig{
 		Database: string(influxdb.ClusterStatus),
 	})
+	if err != nil {
+		return errors.Wrapf(err, "add nodes failed: %s", err.Error())
+	}
+
 	return nil
 }
 
 // RemoveNodes removes nodes
 func (nodeRepository *NodeRepository) RemoveNodes(nodes []*datahub_resource_v1alpha2.Node) error {
+
 	nodeEntities, err := nodeRepository.ListNodeEntities(nodes)
+	if err != nil {
+		return errors.Wrapf(err, "remove nodes failed: %s", err)
+	}
+
 	for nodeEntityIdx := range nodeEntities {
 		inCluster := false
 		nodeEntities[nodeEntityIdx].InCluster = &inCluster
 	}
 
-	nodeRepository.UpdateNodes(nodeEntities)
-	return err
+	err = nodeRepository.UpdateNodes(nodeEntities)
+	if err != nil {
+		return errors.Wrapf(err, "remove nodes failed: %s", err)
+	}
+
+	return nil
 }
 
 // ListNodeEntities returns node entities
@@ -93,6 +105,8 @@ func (nodeRepository *NodeRepository) ListNodeEntities(nodes []*datahub_resource
 					nodeEntities = append(nodeEntities, &entity)
 				}
 			}
+		} else {
+			return nodeEntities, errors.Wrapf(err, "list node entities failed: %s", err.Error())
 		}
 	}
 	return nodeEntities, nil
@@ -102,25 +116,25 @@ func (nodeRepository *NodeRepository) ListNodeEntities(nodes []*datahub_resource
 func (nodeRepository *NodeRepository) UpdateNodes(nodeEntities []*cluster_status_entity.NodeEntity) error {
 
 	var (
-		err            error
 		pointsToUpdate = make([]*influxdb_client.Point, 0)
 	)
 
-	if err != nil {
-		return errors.New("update nodes failed: " + err.Error())
-	}
 	for _, nodeEntity := range nodeEntities {
 		point, err := (*nodeEntity).InfluxDBPoint(string(Node))
 		if err != nil {
-			return errors.New("update nodes failed: " + err.Error())
+			return errors.Wrapf(err, "update nodes failed: %s", err.Error())
 		}
 
 		pointsToUpdate = append(pointsToUpdate, point)
 	}
 
-	nodeRepository.influxDB.WritePoints(pointsToUpdate, influxdb_client.BatchPointsConfig{
+	err := nodeRepository.influxDB.WritePoints(pointsToUpdate, influxdb_client.BatchPointsConfig{
 		Database: string(influxdb.ClusterStatus),
 	})
+	if err != nil {
+		return errors.Wrapf(err, "update nodes failed: %s", err.Error())
+	}
+
 	return nil
 }
 
@@ -141,6 +155,8 @@ func (nodeRepository *NodeRepository) ListNodes(isPredicted *bool) ([]*cluster_s
 				nodeEntities = append(nodeEntities, &entity)
 			}
 		}
+	} else {
+		return nodeEntities, errors.Wrapf(err, "list nodes failed: %s", err.Error())
 	}
 	return nodeEntities, nil
 }

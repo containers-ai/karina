@@ -1,8 +1,9 @@
 package prometheus
 
 import (
-	"errors"
 	"net/url"
+
+	"github.com/pkg/errors"
 )
 
 const (

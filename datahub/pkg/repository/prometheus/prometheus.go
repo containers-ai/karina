@@ -3,7 +3,6 @@ package prometheus
 import (
 	"crypto/tls"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -14,6 +13,7 @@ import (
 	"time"
 
 	"github.com/containers-ai/karina/pkg/utils/log"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -129,13 +129,13 @@ func (p *Prometheus) QueryRange(query string, startTime, endTime *time.Time, ste
 
 	u, err = url.Parse(p.config.URL + endpoint)
 	if err != nil {
-		return Response{}, errors.New("QueryRange failed: url parse failed: " + err.Error())
+		return Response{}, errors.Errorf("url parse failed: %s", err.Error())
 	}
 	u.RawQuery = queryParameters.Encode()
 
 	httpRequest, err = http.NewRequest("GET", u.String(), nil)
 	if err != nil {
-		return Response{}, errors.New("Query: " + err.Error())
+		return Response{}, errors.Errorf("new http request failed: %s", err.Error())
 	}
 	if token := p.config.bearerToken; token != "" {
 		h := http.Header{
@@ -146,11 +146,11 @@ func (p *Prometheus) QueryRange(query string, startTime, endTime *time.Time, ste
 
 	httpResponse, err = p.client.Do(httpRequest)
 	if err != nil {
-		return Response{}, errors.New("QueryRange failed: send http request failed" + err.Error())
+		return Response{}, errors.Errorf("send http request failed: %s", err.Error())
 	}
 	err = decodeHTTPResponse(httpResponse, &response)
 	if err != nil {
-		return Response{}, errors.New("QueryRange failed: " + err.Error())
+		return Response{}, err
 	}
 
 	defer p.Close()
@@ -175,7 +175,7 @@ func decodeHTTPResponse(httpResponse *http.Response, response *Response) error {
 
 	httpResponseBody, err = ioutil.ReadAll(httpResponse.Body)
 	if err != nil {
-		return errors.New("decode http response failed: read http response body failed: " + err.Error())
+		return errors.Errorf("decode http response failed: read http response body failed: %s", err.Error())
 	}
 
 	httpResponseBodyReader = strings.NewReader(string(httpResponseBody))

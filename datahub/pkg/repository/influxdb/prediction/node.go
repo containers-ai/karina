@@ -1,7 +1,6 @@
 package prediction
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -10,6 +9,7 @@ import (
 	node_entity "github.com/containers-ai/karina/datahub/pkg/entity/influxdb/prediction/node"
 	"github.com/containers-ai/karina/datahub/pkg/repository/influxdb"
 	influxdb_client "github.com/influxdata/influxdb/client/v2"
+	"github.com/pkg/errors"
 )
 
 // NodeRepository Repository to access containers' prediction data
@@ -58,12 +58,12 @@ func (r *NodeRepository) CreateNodePrediction(nodePredictions []*prediction_dao.
 					}
 					point, err := influxdb_client.NewPoint(string(Node), tags, fields, sample.Timestamp)
 					if err != nil {
-						return errors.New("new influxdb datapoint failed: " + err.Error())
+						return errors.New("create node prediction failed: new influxdb datapoint failed: " + err.Error())
 					}
 					points = append(points, point)
 				}
 			} else {
-				return fmt.Errorf("map metric type from github.com/containers-ai/karina.datahub.metric.NodeMetricType to type in db falied: metric type not exist %+v", metricType)
+				return errors.Wrapf(err, "create node prediction failed: map metric type from github.com/containers-ai/karina.datahub.metric.NodeMetricType to type in db falied: metric type not exist %+v", metricType)
 			}
 		}
 	}
@@ -72,7 +72,7 @@ func (r *NodeRepository) CreateNodePrediction(nodePredictions []*prediction_dao.
 		Database: string(influxdb.Prediction),
 	})
 	if err != nil {
-		return errors.New("write influxdb datapoint failed: " + err.Error())
+		return errors.Wrapf(err, "create node prediction failed: %s", err.Error())
 	}
 
 	return nil
@@ -110,7 +110,7 @@ func (r *NodeRepository) ListNodePredictionsByRequest(request prediction_dao.Lis
 
 	results, err = r.influxDB.QueryDB(cmd, string(influxdb.Prediction))
 	if err != nil {
-		return entities, err
+		return entities, errors.Wrapf(err, "list node prediction by request failed: %s", err.Error())
 
 	}
 
