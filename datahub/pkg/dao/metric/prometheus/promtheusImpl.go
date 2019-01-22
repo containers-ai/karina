@@ -1,7 +1,6 @@
 package prometheus
 
 import (
-	"errors"
 	"strings"
 	"sync"
 	"time"
@@ -13,6 +12,7 @@ import (
 	"github.com/containers-ai/karina/datahub/pkg/entity/prometheus/nodeMemoryUsageBytes"
 	"github.com/containers-ai/karina/datahub/pkg/repository/prometheus"
 	promRepository "github.com/containers-ai/karina/datahub/pkg/repository/prometheus/metric"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -47,9 +47,10 @@ func (p *prometheusMetricDAOImpl) ListPodMetrics(req metric.ListPodMetricsReques
 	containerCPUEntities, err = podContainerCPURepo.ListMetricsByPodNamespacedName(req.Namespace, req.PodName, req.StartTime, req.EndTime, req.StepTime)
 	if err != nil {
 		if strings.Contains(err.Error(), prometheusDecreaseQueryMessage) {
-			return podsMetricMap, metric.NewErrorQueryConditionExceedMaximum(err.Error())
+			e := metric.NewErrorQueryConditionExceedMaximum("list pod metrics failed: %s"+err.Error(), err)
+			return podsMetricMap, e
 		}
-		return podsMetricMap, errors.New("list pod metrics failed: " + err.Error())
+		return podsMetricMap, errors.Wrapf(err, "list pod metrics failed: %s", err.Error())
 	}
 
 	for _, entity := range containerCPUEntities {
@@ -62,9 +63,10 @@ func (p *prometheusMetricDAOImpl) ListPodMetrics(req metric.ListPodMetricsReques
 	containerMemoryEntities, err = podContainerMemoryRepo.ListMetricsByPodNamespacedName(req.Namespace, req.PodName, req.StartTime, req.EndTime, req.StepTime)
 	if err != nil {
 		if strings.Contains(err.Error(), prometheusDecreaseQueryMessage) {
-			return podsMetricMap, metric.NewErrorQueryConditionExceedMaximum(err.Error())
+			e := metric.NewErrorQueryConditionExceedMaximum(err.Error(), err)
+			return podsMetricMap, e
 		}
-		return podsMetricMap, errors.New("list pod metrics failed: " + err.Error())
+		return podsMetricMap, errors.Wrapf(err, "list pod metrics failed: %s", err.Error())
 	}
 
 	for _, entity := range containerMemoryEntities {
@@ -103,7 +105,6 @@ func (p *prometheusMetricDAOImpl) ListNodesMetric(req metric.ListNodeMetricsRequ
 	wg.Add(len(nodeNames))
 	for _, nodeName := range nodeNames {
 		go p.produceNodeMetric(nodeName, req.StartTime, req.EndTime, req.StepTime, nodeMetricChan, errChan, &wg)
-		// go p.produceNodeMetric(nodeName, req.StartTime, req.EndTime, nodeMetricChan, errChan, &wg)
 	}
 
 	go addNodeMetricToNodesMetricMap(ptrNodesMetricMap, nodeMetricChan, done)
@@ -115,9 +116,10 @@ func (p *prometheusMetricDAOImpl) ListNodesMetric(req metric.ListNodeMetricsRequ
 	case _ = <-done:
 	case err := <-errChan:
 		if strings.Contains(err.Error(), prometheusDecreaseQueryMessage) {
-			return metric.NodesMetricMap{}, metric.NewErrorQueryConditionExceedMaximum(err.Error())
+			e := metric.NewErrorQueryConditionExceedMaximum("list node metrics failed: %s"+err.Error(), err)
+			return metric.NodesMetricMap{}, e
 		}
-		return metric.NodesMetricMap{}, err
+		return metric.NodesMetricMap{}, errors.Wrapf(err, "list node metrics failed: %s", err.Error())
 	}
 
 	ptrNodesMetricMap.SortByTimestamp(req.QueryCondition.TimestampOrder)
@@ -141,7 +143,7 @@ func (p *prometheusMetricDAOImpl) produceNodeMetric(nodeName string, startTime *
 	nodeCPUUsageRepo = promRepository.NewNodeCPUUsagePercentageRepositoryWithConfig(p.prometheusConfig)
 	nodeCPUUsageEntities, err = nodeCPUUsageRepo.ListMetricsByNodeName(nodeName, startTime, endTime, stepTime)
 	if err != nil {
-		errChan <- errors.New("list node metrics failed: " + err.Error())
+		errChan <- err
 		return
 	}
 
@@ -154,7 +156,7 @@ func (p *prometheusMetricDAOImpl) produceNodeMetric(nodeName string, startTime *
 	nodeMemoryUsageRepo = promRepository.NewNodeMemoryUsageBytesRepositoryWithConfig(p.prometheusConfig)
 	nodeMemoryUsageEntities, err = nodeMemoryUsageRepo.ListMetricsByNodeName(nodeName, startTime, endTime, stepTime)
 	if err != nil {
-		errChan <- errors.New("list node metrics failed: " + err.Error())
+		errChan <- err
 		return
 	}
 

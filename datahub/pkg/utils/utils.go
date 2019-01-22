@@ -8,6 +8,7 @@ import (
 	"github.com/containers-ai/karina/datahub/pkg/repository/influxdb"
 	logUtil "github.com/containers-ai/karina/pkg/utils/log"
 	"github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -32,6 +33,9 @@ func (m StringStringMap) ReplaceKeys(old, new []string) StringStringMap {
 // ParseTime parses time string to Time
 func ParseTime(timeStr string) (time.Time, error) {
 	t, err := time.Parse(time.RFC3339, timeStr)
+	if err != nil {
+		err = errors.Errorf("parse timestamp failed: %s", err.Error())
+	}
 
 	return t, err
 }
@@ -82,6 +86,7 @@ func StringToInt64(str string) (int64, error) {
 	if val, err := strconv.ParseFloat(str, 64); err == nil {
 		return int64(val), err
 	} else {
+		err = errors.Errorf("convert string to int64 failed: %s", err.Error())
 		return 0, err
 	}
 }

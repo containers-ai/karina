@@ -1,12 +1,11 @@
 package score
 
 import (
-	"errors"
-
 	score_dao "github.com/containers-ai/karina/datahub/pkg/dao/score"
 	influxdb_entity_score "github.com/containers-ai/karina/datahub/pkg/entity/influxdb/score"
 	"github.com/containers-ai/karina/datahub/pkg/repository/influxdb"
 	influxdb_client "github.com/influxdata/influxdb/client/v2"
+	"github.com/pkg/errors"
 )
 
 // SimulatedSchedulingScoreRepository Repository of simulated_scheduling_score data
@@ -50,7 +49,7 @@ func (r SimulatedSchedulingScoreRepository) ListScoresByRequest(request score_da
 
 	results, err = r.influxDB.QueryDB(cmd, string(influxdb.Score))
 	if err != nil {
-		return scores, errors.New("SimulatedSchedulingScoreRepository list scores failed: " + err.Error())
+		return scores, errors.Wrapf(err, "list scores by request failed: %s", err.Error())
 	}
 
 	influxdbRows = influxdb.PackMap(results)
@@ -87,7 +86,7 @@ func (r SimulatedSchedulingScoreRepository) CreateScores(scores []*score_dao.Sim
 
 		point, err := entity.InfluxDBPoint(string(SimulatedSchedulingScore))
 		if err != nil {
-			return errors.New("SimulatedSchedulingScoreRepository create scores failed: build influxdb point failed: " + err.Error())
+			return errors.Wrapf(err, "create score failed: %s", err.Error())
 		}
 		points = append(points, point)
 	}
@@ -96,7 +95,7 @@ func (r SimulatedSchedulingScoreRepository) CreateScores(scores []*score_dao.Sim
 		Database: string(influxdb.Score),
 	})
 	if err != nil {
-		return errors.New("SimulatedSchedulingScoreRepository create scores failed: " + err.Error())
+		return errors.Wrapf(err, "create score failed: %s", err.Error())
 	}
 
 	return nil

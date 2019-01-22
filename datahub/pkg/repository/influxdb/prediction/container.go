@@ -1,13 +1,13 @@
 package prediction
 
 import (
-	"errors"
 	"fmt"
 
 	prediction_dao "github.com/containers-ai/karina/datahub/pkg/dao/prediction"
 	container_entity "github.com/containers-ai/karina/datahub/pkg/entity/influxdb/prediction/container"
 	"github.com/containers-ai/karina/datahub/pkg/repository/influxdb"
 	influxdb_client "github.com/influxdata/influxdb/client/v2"
+	"github.com/pkg/errors"
 )
 
 // ContainerRepository Repository to access containers' prediction data
@@ -58,12 +58,12 @@ func (r *ContainerRepository) CreateContainerPrediction(containersPrediction []*
 					}
 					point, err := influxdb_client.NewPoint(string(Container), tags, fields, sample.Timestamp)
 					if err != nil {
-						return errors.New("new influxdb data point failed: " + err.Error())
+						return errors.Errorf("create container predictions failed: new influxdb data point failed: %s", err.Error())
 					}
 					points = append(points, point)
 				}
 			} else {
-				return fmt.Errorf(`map metric type from github.com/containers-ai/karina.datahub.metric.ContainerMetricType
+				return errors.Wrapf(err, `create container predictions failed: map metric type from github.com/containers-ai/karina.datahub.metric.ContainerMetricType
 				 to type in github.com/containers-ai/karina/datahub/pkg/entity/influxdb/prediction/container falied: metric type not exist %+v`, metricType)
 			}
 		}
@@ -73,7 +73,7 @@ func (r *ContainerRepository) CreateContainerPrediction(containersPrediction []*
 		Database: string(influxdb.Prediction),
 	})
 	if err != nil {
-		return errors.New("write influxdb data point failed: " + err.Error())
+		return errors.Wrapf(err, "create container predictions failed: %s", err.Error())
 	}
 
 	return nil
@@ -111,7 +111,7 @@ func (r *ContainerRepository) ListContainerPredictionsByRequest(request predicti
 
 	results, err = r.influxDB.QueryDB(cmd, string(influxdb.Prediction))
 	if err != nil {
-		return entities, err
+		return entities, errors.Wrapf(err, "list container prediction failed: %s", err.Error())
 	}
 
 	rows = influxdb.PackMap(results)

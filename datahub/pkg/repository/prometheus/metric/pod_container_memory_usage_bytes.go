@@ -1,12 +1,12 @@
 package metric
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/containers-ai/karina/datahub/pkg/entity/prometheus/containerMemoryUsageBytes"
 	"github.com/containers-ai/karina/datahub/pkg/repository/prometheus"
+	"github.com/pkg/errors"
 )
 
 // PodContainerMemoryUsageBytesRepository Repository to access metric container_memory_usage_bytes from prometheus
@@ -38,7 +38,7 @@ func (c PodContainerMemoryUsageBytesRepository) ListMetricsByPodNamespacedName(n
 
 	prometheusClient, err = prometheus.New(c.PrometheusConfig)
 	if err != nil {
-		return entities, errors.New("QueryRangeByPodNamespacedName failed: " + err.Error())
+		return entities, errors.Wrapf(err, "list metrics by pod namespaced name failed: %s", err.Error())
 	}
 
 	metricName = containerMemoryUsageBytes.MetricName
@@ -52,14 +52,14 @@ func (c PodContainerMemoryUsageBytesRepository) ListMetricsByPodNamespacedName(n
 
 	response, err = prometheusClient.QueryRange(queryExpression, startTime, endTime, stepTime)
 	if err != nil {
-		return entities, errors.New("QueryRangeByPodNamespacedName failed: " + err.Error())
+		return entities, errors.Wrapf(err, "list metrics by pod namespaced name failed: %s", err.Error())
 	} else if response.Status != prometheus.StatusSuccess {
-		return entities, errors.New("QueryRangeByPodNamespacedName failed: receive error response from prometheus: " + response.Error)
+		return entities, errors.New("list metrics by pod namespaced name failed: receive error response from prometheus: " + response.Error)
 	}
 
 	entities, err = response.GetEntitis()
 	if err != nil {
-		return entities, errors.New("ListMetricsByPodNamespacedName failed: " + err.Error())
+		return entities, errors.Wrapf(err, "list metrics by pod namespaced name failed: %s", err.Error())
 	}
 
 	return entities, nil

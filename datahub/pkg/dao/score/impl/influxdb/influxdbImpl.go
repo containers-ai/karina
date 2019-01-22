@@ -1,12 +1,11 @@
 package influxdb
 
 import (
-	"errors"
-
 	score_dao "github.com/containers-ai/karina/datahub/pkg/dao/score"
 	influxdb_entity_score "github.com/containers-ai/karina/datahub/pkg/entity/influxdb/score"
 	"github.com/containers-ai/karina/datahub/pkg/repository/influxdb"
 	influxdb_repository_score "github.com/containers-ai/karina/datahub/pkg/repository/influxdb/score"
+	"github.com/pkg/errors"
 )
 
 type influxdbDAO struct {
@@ -34,7 +33,7 @@ func (dao influxdbDAO) ListSimulatedScheduingScores(request score_dao.ListReques
 	scoreRepository = influxdb_repository_score.NewRepositoryWithConfig(dao.config)
 	influxdbScoreEntities, err = scoreRepository.ListScoresByRequest(request)
 	if err != nil {
-		return scores, errors.New("influxdb score dao CreateSimulatedScheduingScores failed: " + err.Error())
+		return scores, errors.Wrapf(err, "list simulated scheduling scores failed: %s", err.Error())
 	}
 
 	for _, influxdbScoreEntity := range influxdbScoreEntities {
@@ -69,7 +68,7 @@ func (dao influxdbDAO) CreateSimulatedScheduingScores(scores []*score_dao.Simula
 	scoreRepository = influxdb_repository_score.NewRepositoryWithConfig(dao.config)
 	err = scoreRepository.CreateScores(scores)
 	if err != nil {
-		return errors.New("influxdb score dao CreateSimulatedScheduingScores failed: " + err.Error())
+		return errors.Wrapf(err, "create simulated scheduling scores failed: %s", err.Error())
 	}
 
 	return nil

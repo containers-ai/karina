@@ -9,6 +9,7 @@ import (
 
 	"github.com/containers-ai/karina/pkg/utils/log"
 	client "github.com/influxdata/influxdb/client/v2"
+	"github.com/pkg/errors"
 )
 
 type Database string
@@ -55,7 +56,7 @@ func New(influxCfg *Config) *InfluxDBRepository {
 // CreateDatabase creates database
 func (influxDBRepository *InfluxDBRepository) CreateDatabase(db string) error {
 	_, err := influxDBRepository.QueryDB(fmt.Sprintf("CREATE DATABASE %s", db), db)
-	return err
+	return errors.Wrapf(err, "create database failed: %s", err.Error())
 }
 
 func (influxDBRepository *InfluxDBRepository) newHttpClient() client.Client {
@@ -79,6 +80,7 @@ func (influxDBRepository *InfluxDBRepository) WritePoints(points []*client.Point
 	bp, err := client.NewBatchPoints(bpCfg)
 	if err != nil {
 		scope.Error(err.Error())
+		return errors.Wrapf(err, "write points to influxdb failed: new influxdb batch points failed: %s", err.Error())
 	}
 
 	for _, point := range points {
@@ -89,14 +91,13 @@ func (influxDBRepository *InfluxDBRepository) WritePoints(points []*client.Point
 		if strings.Contains(err.Error(), "database not found") {
 			if err = influxDBRepository.CreateDatabase(bpCfg.Database); err != nil {
 				scope.Error(err.Error())
-				return err
 			} else {
 				err = influxDBRepository.WritePoints(points, bpCfg)
 			}
 		}
 		if err != nil {
 			scope.Error(err.Error())
-			return err
+			return errors.Wrapf(err, "write batch points to influxdb falied: %s", err.Error())
 		}
 	}
 
@@ -113,15 +114,16 @@ func (influxDBRepository *InfluxDBRepository) QueryDB(cmd, database string) (res
 	}
 	if response, err := clnt.Query(q); err == nil {
 		if response.Error() != nil {
-			return res, response.Error()
+			return res, errors.Errorf("query influxdb failed: receive error response from influxdb: %s", response.Error())
 		}
 		res = response.Results
 	} else {
-		return res, err
+		return res, errors.Wrapf(err, "query influxdb failed: %s", err.Error())
 	}
 	return res, nil
 }
 
+// PackMap converts results to slice of pointer to InfluxDBRow
 func PackMap(results []client.Result) []*InfluxDBRow {
 	var rows []*InfluxDBRow
 
