@@ -1,0 +1,9 @@
+version: 2
+jobs:
+  build_operator:
+    docker:
+      - image: circle/golang:1.11.4
+    working_directory: /go/src/github.com/containers-ai/karina
+    steps:
+      - checkout
+      - run: cd /go/src/github.com/containers-ai/karina/operator; make manager
