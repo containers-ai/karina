@@ -1,4 +1,5 @@
 /*
+Copyright 2019 The Karina Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,10 +19,11 @@ package scaler
 import (
 	"context"
 	"fmt"
-	"github.com/golang/protobuf/ptypes/timestamp"
-	"google.golang.org/genproto/googleapis/rpc/code"
 	"strings"
 	"time"
+
+	"github.com/golang/protobuf/ptypes/timestamp"
+	"google.golang.org/genproto/googleapis/rpc/code"
 
 	datahub_recommendation_v1alpha2 "github.com/containers-ai/api/datahub/recommendation/v1alpha2"
 	datahub_resource_metadata_v1alpha2 "github.com/containers-ai/api/datahub/resource/metadata/v1alpha2"
@@ -101,8 +103,6 @@ type ReconcileScaler struct {
 // TODO(user): Modify this Reconcile function to implement your Controller logic.  The scaffolding writes
 // a Deployment as an example
 // Automatically generate RBAC rules to allow the Controller to read and write Deployments
-// +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=apps,resources=deployments/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=autoscaling.federator.ai,resources=scalers,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=autoscaling.federator.ai,resources=scalers/status,verbs=get;update;patch
 func (r *ReconcileScaler) Reconcile(request reconcile.Request) (reconcile.Result, error) {
@@ -129,7 +129,9 @@ func (r *ReconcileScaler) Reconcile(request reconcile.Request) (reconcile.Result
 		scope.Infof(fmt.Sprintf("Scaler (%s/%s) found, try to sync latest controllers.", scalerNS, scalerName))
 		if deployments, err := listResources.ListDeploymentsByLabels(scaler.Spec.Selector.MatchLabels); err == nil {
 			for _, deployment := range deployments {
-				scaler = scalerReconciler.UpdateStatusByDeployment(&deployment)
+				if deployment.ObjectMeta.Namespace == request.Namespace {
+					scaler = scalerReconciler.UpdateStatusByDeployment(&deployment)
+				}
 			}
 			updateResource.UpdateScaler(scaler)
 		}
